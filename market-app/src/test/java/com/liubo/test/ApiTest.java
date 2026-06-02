@@ -1,6 +1,7 @@
 package com.liubo.test;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.liubo.domain.strategy.service.IStrategyService;
 import com.liubo.infrastructure.persistent.dao.StrategyMapper;
 import com.liubo.infrastructure.persistent.po.Strategy;
 import jakarta.annotation.Resource;
@@ -20,10 +21,24 @@ public class ApiTest {
     @Resource
     private StrategyMapper awardDao;
 
+    @Resource
+    private IStrategyService strategyService;
+
     @Test
     public void test_queryAwardList() {
         List<Strategy> list = awardDao.selectList(new LambdaQueryWrapper<>());
         System.out.println(list);
     }
 
+    @Test
+    public void test2() {
+        strategyService.assembleLotteryStrategy(100001L);
+    }
+
+    @Test
+    public void test3() {
+        System.out.println(strategyService.getRandomAwardId(100001L));
+        System.out.println(strategyService.getRandomAwardId(100001L));
+        System.out.println(strategyService.getRandomAwardId(100001L));
+    }
 }
