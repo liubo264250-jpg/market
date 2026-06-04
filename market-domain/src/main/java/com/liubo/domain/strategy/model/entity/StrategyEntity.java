@@ -1,9 +1,15 @@
 package com.liubo.domain.strategy.model.entity;
 
+import com.liubo.types.common.Constants;
+import com.liubo.types.enums.RuleModelEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author 68
@@ -28,4 +34,17 @@ public class StrategyEntity {
      * 规则模型，rule配置的模型同步到此表，便于使用
      */
     private String ruleModels;
+
+    public String[] ruleModels() {
+        if (StringUtils.isBlank(ruleModels)) return null;
+        return ruleModels.split(Constants.SPLIT);
+    }
+
+    public String getRuleWeightRuleModel() {
+        return Arrays.stream(Optional.ofNullable(this.ruleModels())
+                .orElse(new String[0]))
+                .filter(RuleModelEnum::hitRuleWeight)
+                .findFirst()
+                .orElse(null);
+    }
 }

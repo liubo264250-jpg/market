@@ -1,6 +1,8 @@
 package com.liubo.domain.strategy.repositroy;
 
 import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
+import com.liubo.domain.strategy.model.entity.StrategyEntity;
+import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -12,9 +14,13 @@ import java.util.Map;
 public interface IStrategyRepository {
     List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId);
 
-    void storeStrategyAwardSearchRateTable(Long strategyId, int size, Map<Integer, Integer> shuffleStrategyAwardSearchRateTable);
+    void storeStrategyAwardSearchRateTable(String strategyId, int size, Map<Integer, Integer> shuffleStrategyAwardSearchRateTable);
 
     Integer getStrategyAwardAssemble(Long strategyId, Integer rateKey);
 
-    int getRateRange(Long strategyId);
+    int getRateRange(String strategyId);
+
+    StrategyEntity queryStrategy(Long strategyId);
+
+    StrategyRuleEntity queryStrategyRule(Long strategyId, String ruleModel);
 }

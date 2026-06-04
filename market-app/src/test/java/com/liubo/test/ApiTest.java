@@ -1,7 +1,8 @@
 package com.liubo.test;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.liubo.domain.strategy.service.IStrategyService;
+import com.liubo.domain.strategy.service.IStrategyArmory;
+import com.liubo.domain.strategy.service.IStrategyDispatch;
 import com.liubo.infrastructure.persistent.dao.StrategyMapper;
 import com.liubo.infrastructure.persistent.po.Strategy;
 import jakarta.annotation.Resource;
@@ -22,7 +23,10 @@ public class ApiTest {
     private StrategyMapper awardDao;
 
     @Resource
-    private IStrategyService strategyService;
+    private IStrategyArmory strategyService;
+
+    @Resource
+    private IStrategyDispatch strategyDispatch;
 
     @Test
     public void test_queryAwardList() {
@@ -40,5 +44,17 @@ public class ApiTest {
         System.out.println(strategyService.getRandomAwardId(100001L));
         System.out.println(strategyService.getRandomAwardId(100001L));
         System.out.println(strategyService.getRandomAwardId(100001L));
+    }
+
+    @Test
+    public void test4() {
+        log.info("测试结果：{} - 奖品ID值", strategyDispatch.getRandomAwardId(100001L));
+    }
+
+    @Test
+    public void test5() {
+        log.info("测试结果：{} - 4000 策略配置", strategyDispatch.getRandomAwardId(100001L, "4000:102,103,104,105"));
+        log.info("测试结果：{} - 5000 策略配置", strategyDispatch.getRandomAwardId(100001L, "5000:102,103,104,105,106,107"));
+        log.info("测试结果：{} - 6000 策略配置", strategyDispatch.getRandomAwardId(100001L, "6000:102,103,104,105,106,107,108,109"));
     }
 }
