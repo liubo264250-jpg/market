@@ -40,13 +40,6 @@ public class ApiTest {
     }
 
     @Test
-    public void test3() {
-        System.out.println(strategyService.getRandomAwardId(100001L));
-        System.out.println(strategyService.getRandomAwardId(100001L));
-        System.out.println(strategyService.getRandomAwardId(100001L));
-    }
-
-    @Test
     public void test4() {
         log.info("测试结果：{} - 奖品ID值", strategyDispatch.getRandomAwardId(100001L));
     }

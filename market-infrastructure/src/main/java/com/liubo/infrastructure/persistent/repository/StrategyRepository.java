@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -88,7 +89,7 @@ public class StrategyRepository implements IStrategyRepository {
         String cacheKey = Constants.RedisKey.STRATEGY_KEY + strategyId;
         StrategyEntity strategyEntity = redisService.getValue(cacheKey);
         if (null != strategyEntity) return strategyEntity;
-        Strategy strategy = strategyMapper.selectOne(Wrappers.<Strategy>lambdaQuery().eq(Strategy::getStrategyId,strategyId));
+        Strategy strategy = strategyMapper.selectOne(Wrappers.<Strategy>lambdaQuery().eq(Strategy::getStrategyId, strategyId));
         strategyEntity = StrategyEntity.builder()
                 .strategyId(strategy.getStrategyId())
                 .strategyDesc(strategy.getStrategyDesc())
@@ -114,5 +115,14 @@ public class StrategyRepository implements IStrategyRepository {
                 .ruleValue(strategyRuleRes.getRuleValue())
                 .ruleDesc(strategyRuleRes.getRuleDesc())
                 .build();
+    }
+
+    @Override
+    public String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel) {
+        StrategyRule strategyRule = strategyRuleMapper.selectOne(Wrappers.<StrategyRule>lambdaQuery()
+                .eq(StrategyRule::getStrategyId, strategyId)
+                .eq(awardId != null, StrategyRule::getAwardId, awardId)
+                .eq(StrategyRule::getRuleModel, ruleModel));
+        return Optional.ofNullable(strategyRule).map(StrategyRule::getRuleValue).orElse("");
     }
 }
