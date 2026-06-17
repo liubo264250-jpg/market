@@ -1,10 +1,8 @@
 package com.liubo.domain.strategy.service.raffle;
 
-import com.liubo.domain.strategy.model.entity.RaffleAwardEntity;
-import com.liubo.domain.strategy.model.entity.RaffleFactorEntity;
-import com.liubo.domain.strategy.model.entity.RuleActionEntity;
-import com.liubo.domain.strategy.model.entity.StrategyEntity;
+import com.liubo.domain.strategy.model.entity.*;
 import com.liubo.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
+import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
 import com.liubo.domain.strategy.service.IRaffleStrategy;
 import com.liubo.domain.strategy.service.IStrategyDispatch;
@@ -40,14 +38,14 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
             throw new AppException(ResponseCode.ILLEGAL_PARAMETER.getCode(), ResponseCode.ILLEGAL_PARAMETER.getInfo());
         }
         StrategyEntity strategy = repository.queryStrategy(strategyId);
-        RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> ruleActionEntity = this.doCheckRaffleBeforeLogic(RaffleFactorEntity.builder().userId(userId).strategyId(strategyId).build(), strategy.ruleModels());
-        if (RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(ruleActionEntity.getCode())) {
-            if (DefaultLogicFactory.LogicModel.RULE_BLACKLIST.getCode().equals(ruleActionEntity.getRuleModel())) {
+        RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> ruleActionBeforeEntity = this.doCheckRaffleBeforeLogic(RaffleFactorEntity.builder().userId(userId).strategyId(strategyId).build(), strategy.ruleModels());
+        if (RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(ruleActionBeforeEntity.getCode())) {
+            if (DefaultLogicFactory.LogicModel.RULE_BLACKLIST.getCode().equals(ruleActionBeforeEntity.getRuleModel())) {
                 return RaffleAwardEntity.builder()
-                        .awardId(ruleActionEntity.getData().getAwardId())
+                        .awardId(ruleActionBeforeEntity.getData().getAwardId())
                         .build();
-            } else if (DefaultLogicFactory.LogicModel.RULE_WIGHT.getCode().equals(ruleActionEntity.getRuleModel())) {
-                String ruleWeightValueKey = ruleActionEntity.getData().getRuleWeightValueKey();
+            } else if (DefaultLogicFactory.LogicModel.RULE_WIGHT.getCode().equals(ruleActionBeforeEntity.getRuleModel())) {
+                String ruleWeightValueKey = ruleActionBeforeEntity.getData().getRuleWeightValueKey();
                 Integer awardId = strategyDispatch.getRandomAwardId(strategyId, ruleWeightValueKey);
                 return RaffleAwardEntity.builder()
                         .awardId(awardId)
@@ -55,10 +53,24 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
             }
         }
         Integer awardId = strategyDispatch.getRandomAwardId(strategyId);
+        StrategyAwardRuleModelVO strategyAwardRuleModelVO = repository.queryStrategyAwardRuleModelVO(strategyId, awardId);
+        RuleActionEntity<RuleActionEntity.RaffleCenterEntity> ruleActionCenterEntity = this.doCheckRaffleCenterLogic(RaffleFactorEntity.builder()
+                .strategyId(strategyId)
+                .userId(userId)
+                .awardId(awardId)
+                .build(), strategyAwardRuleModelVO.raffleCenterRuleModelList());
+        if (RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(ruleActionCenterEntity.getCode())) {
+            log.info("【临时日志】中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。");
+            return RaffleAwardEntity.builder()
+                    .awardDesc("中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。")
+                    .build();
+        }
         return RaffleAwardEntity.builder()
                 .awardId(awardId)
                 .build();
     }
 
     protected abstract RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> doCheckRaffleBeforeLogic(RaffleFactorEntity raffleFactorEntity, String... logics);
+
+    protected abstract RuleActionEntity<RuleActionEntity.RaffleCenterEntity> doCheckRaffleCenterLogic(RaffleFactorEntity raffleFactorEntity, String... logics);
 }

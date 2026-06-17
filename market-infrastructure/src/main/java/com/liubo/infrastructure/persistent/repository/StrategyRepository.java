@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
+import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
 import com.liubo.infrastructure.persistent.dao.StrategyAwardMapper;
 import com.liubo.infrastructure.persistent.dao.StrategyMapper;
@@ -124,5 +125,14 @@ public class StrategyRepository implements IStrategyRepository {
                 .eq(awardId != null, StrategyRule::getAwardId, awardId)
                 .eq(StrategyRule::getRuleModel, ruleModel));
         return Optional.ofNullable(strategyRule).map(StrategyRule::getRuleValue).orElse("");
+    }
+
+    @Override
+    public StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer awardId) {
+        StrategyAward strategyAward = strategyAwardMapper.selectOne(Wrappers.<StrategyAward>lambdaQuery()
+                .eq(StrategyAward::getStrategyId, strategyId)
+                .eq(StrategyAward::getAwardId, awardId));
+        String ruleModels = Optional.ofNullable(strategyAward).map(StrategyAward::getRuleModels).orElse("");
+        return StrategyAwardRuleModelVO.builder().ruleModels(ruleModels).build();
     }
 }
