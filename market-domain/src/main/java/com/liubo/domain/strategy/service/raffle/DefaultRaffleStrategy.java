@@ -5,9 +5,10 @@ import com.liubo.domain.strategy.model.entity.RuleActionEntity;
 import com.liubo.domain.strategy.model.entity.RuleMatterEntity;
 import com.liubo.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
-import com.liubo.domain.strategy.service.IStrategyDispatch;
-import com.liubo.domain.strategy.service.rule.ILogicFilter;
-import com.liubo.domain.strategy.service.rule.factory.DefaultLogicFactory;
+import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
+import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
+import com.liubo.domain.strategy.service.rule.filter.ILogicFilter;
+import com.liubo.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,8 +30,8 @@ public class DefaultRaffleStrategy extends AbstractRaffleStrategy {
     @Resource
     private DefaultLogicFactory logicFactory;
 
-    public DefaultRaffleStrategy(IStrategyRepository repository, IStrategyDispatch strategyDispatch) {
-        super(repository, strategyDispatch);
+    public DefaultRaffleStrategy(IStrategyRepository repository, IStrategyDispatch strategyDispatch, DefaultChainFactory defaultChainFactory) {
+        super(repository, strategyDispatch, defaultChainFactory);
     }
 
     @Override

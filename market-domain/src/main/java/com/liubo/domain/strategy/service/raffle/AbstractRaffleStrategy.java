@@ -5,8 +5,10 @@ import com.liubo.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
 import com.liubo.domain.strategy.service.IRaffleStrategy;
-import com.liubo.domain.strategy.service.IStrategyDispatch;
-import com.liubo.domain.strategy.service.rule.factory.DefaultLogicFactory;
+import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
+import com.liubo.domain.strategy.service.rule.chain.ILogicChain;
+import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
+import com.liubo.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +25,14 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
     protected IStrategyRepository repository;
     // 策略调度服务 -> 只负责抽奖处理，通过新增接口的方式，隔离职责，不需要使用方关心或者调用抽奖的初始化
     protected IStrategyDispatch strategyDispatch;
+    protected DefaultChainFactory defaultChainFactory;
 
-    public AbstractRaffleStrategy(IStrategyRepository repository, IStrategyDispatch strategyDispatch) {
+    public AbstractRaffleStrategy(IStrategyRepository repository,
+                                  IStrategyDispatch strategyDispatch,
+                                  DefaultChainFactory defaultChainFactory) {
         this.repository = repository;
         this.strategyDispatch = strategyDispatch;
+        this.defaultChainFactory = defaultChainFactory;
     }
 
     @Override
@@ -52,7 +58,9 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
                         .build();
             }
         }
-        Integer awardId = strategyDispatch.getRandomAwardId(strategyId);
+        ILogicChain logicChain = defaultChainFactory.openLogicChain(strategyId);
+        Integer awardId = logicChain.logic(userId, strategyId);
+
         StrategyAwardRuleModelVO strategyAwardRuleModelVO = repository.queryStrategyAwardRuleModelVO(strategyId, awardId);
         RuleActionEntity<RuleActionEntity.RaffleCenterEntity> ruleActionCenterEntity = this.doCheckRaffleCenterLogic(RaffleFactorEntity.builder()
                 .strategyId(strategyId)

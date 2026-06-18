@@ -1,4 +1,4 @@
-package com.liubo.domain.strategy.service.rule;
+package com.liubo.domain.strategy.service.rule.filter;
 
 import com.liubo.domain.strategy.model.entity.RuleActionEntity;
 import com.liubo.domain.strategy.model.entity.RuleMatterEntity;

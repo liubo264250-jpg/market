@@ -1,4 +1,4 @@
-package com.liubo.domain.strategy.service;
+package com.liubo.domain.strategy.service.armory;
 
 /**
  * @author 68

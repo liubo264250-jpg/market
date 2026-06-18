@@ -1,8 +1,8 @@
-package com.liubo.domain.strategy.service.rule.factory;
+package com.liubo.domain.strategy.service.rule.filter.factory;
 
 import com.liubo.domain.strategy.model.entity.RuleActionEntity;
 import com.liubo.domain.strategy.service.annotation.LogicStrategy;
-import com.liubo.domain.strategy.service.rule.ILogicFilter;
+import com.liubo.domain.strategy.service.rule.filter.ILogicFilter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.core.annotation.AnnotationUtils;

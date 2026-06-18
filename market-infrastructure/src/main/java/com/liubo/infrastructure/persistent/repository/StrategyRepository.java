@@ -128,6 +128,14 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
+    public String queryStrategyRuleValue(Long strategyId, String ruleModel) {
+        StrategyRule strategyRule = strategyRuleMapper.selectOne(Wrappers.<StrategyRule>lambdaQuery()
+                .eq(StrategyRule::getStrategyId, strategyId)
+                .eq(StrategyRule::getRuleModel, ruleModel));
+        return Optional.ofNullable(strategyRule).map(StrategyRule::getRuleValue).orElse("");
+    }
+
+    @Override
     public StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer awardId) {
         StrategyAward strategyAward = strategyAwardMapper.selectOne(Wrappers.<StrategyAward>lambdaQuery()
                 .eq(StrategyAward::getStrategyId, strategyId)

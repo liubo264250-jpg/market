@@ -1,8 +1,8 @@
 package com.liubo.test;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.liubo.domain.strategy.service.IStrategyArmory;
-import com.liubo.domain.strategy.service.IStrategyDispatch;
+import com.liubo.domain.strategy.service.armory.IStrategyArmory;
+import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
 import com.liubo.infrastructure.persistent.dao.StrategyMapper;
 import com.liubo.infrastructure.persistent.po.Strategy;
 import jakarta.annotation.Resource;
