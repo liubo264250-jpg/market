@@ -5,6 +5,7 @@ import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
 import com.liubo.domain.strategy.model.valobj.RuleTreeVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
+import com.liubo.domain.strategy.model.valobj.StrategyAwardStockKeyVO;
 
 import java.util.List;
 import java.util.Map;
@@ -33,4 +34,14 @@ public interface IStrategyRepository {
     StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Integer awardId);
 
     RuleTreeVO queryRuleTreeVOByTreeId(String ruleModels);
+
+    void cacheStrategyAwardCount(String cacheKey, Integer awardCount);
+
+    void awardStockConsumeSendQueue(StrategyAwardStockKeyVO strategyAwardStockKeyVO);
+
+    StrategyAwardStockKeyVO takeQueueValue();
+
+    void updateStrategyAwardStock(Long strategyId, Integer awardId);
+
+    Boolean subtractionAwardStock(String cacheKey);
 }

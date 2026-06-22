@@ -2,6 +2,7 @@ package com.liubo.domain.strategy.service.raffle;
 
 import com.liubo.domain.strategy.model.valobj.RuleTreeVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
+import com.liubo.domain.strategy.model.valobj.StrategyAwardStockKeyVO;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
 import com.liubo.domain.strategy.service.AbstractRaffleStrategy;
 import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
@@ -24,13 +25,13 @@ public class DefaultRaffleStrategy extends AbstractRaffleStrategy {
                                  IStrategyDispatch strategyDispatch,
                                  DefaultChainFactory defaultChainFactory,
                                  DefaultTreeFactory defaultTreeFactory) {
-        super(repository, strategyDispatch, defaultChainFactory,defaultTreeFactory);
+        super(repository, strategyDispatch, defaultChainFactory, defaultTreeFactory);
     }
 
     @Override
     protected DefaultChainFactory.StrategyAwardVO raffleLogicChain(String userId, Long strategyId) {
         ILogicChain logicChain = defaultChainFactory.openLogicChain(strategyId);
-        return logicChain.logic(userId,strategyId);
+        return logicChain.logic(userId, strategyId);
     }
 
     @Override
@@ -45,5 +46,15 @@ public class DefaultRaffleStrategy extends AbstractRaffleStrategy {
         }
         IDecisionTreeEngine treeEngine = defaultTreeFactory.openLogicTree(ruleTreeVO);
         return treeEngine.process(userId, strategyId, awardId);
+    }
+
+    @Override
+    public StrategyAwardStockKeyVO takeQueueValue() {
+        return repository.takeQueueValue();
+    }
+
+    @Override
+    public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
+        repository.updateStrategyAwardStock(strategyId, awardId);
     }
 }

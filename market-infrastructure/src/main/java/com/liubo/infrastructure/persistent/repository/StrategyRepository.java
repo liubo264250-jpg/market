@@ -12,9 +12,15 @@ import com.liubo.infrastructure.persistent.po.*;
 import com.liubo.infrastructure.persistent.redis.IRedisService;
 import com.liubo.types.common.Constants;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBlockingQueue;
+import org.redisson.api.RDelayedQueue;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,6 +29,7 @@ import java.util.stream.Collectors;
  * 2026/5/29 08:06
  */
 @Repository
+@Slf4j
 public class StrategyRepository implements IStrategyRepository {
 
     @Resource
@@ -192,5 +199,50 @@ public class StrategyRepository implements IStrategyRepository {
                 .build();
         redisService.setValue(cacheKey, ruleTreeVODB);
         return ruleTreeVODB;
+    }
+
+    @Override
+    public void cacheStrategyAwardCount(String cacheKey, Integer awardCount) {
+        if (redisService.isExists(cacheKey)) return;
+        redisService.setAtomicLong(cacheKey, awardCount);
+    }
+
+    @Override
+    public void awardStockConsumeSendQueue(StrategyAwardStockKeyVO strategyAwardStockKeyVO) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_QUERY_KEY;
+        RBlockingQueue<StrategyAwardStockKeyVO> blockingQueue = redisService.getBlockingQueue(cacheKey);
+        RDelayedQueue<StrategyAwardStockKeyVO> delayedQueue = redisService.getDelayedQueue(blockingQueue);
+        delayedQueue.offer(strategyAwardStockKeyVO,3, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public StrategyAwardStockKeyVO takeQueueValue() {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_QUERY_KEY;
+        RBlockingQueue<StrategyAwardStockKeyVO> queue = redisService.getBlockingQueue(cacheKey);
+        return queue.poll();
+    }
+
+    @Override
+    public void updateStrategyAwardStock(Long strategyId, Integer awardId) {
+        StrategyAward strategyAward = new StrategyAward();
+        strategyAward.setStrategyId(strategyId);
+        strategyAward.setAwardId(awardId);
+        strategyAwardMapper.updateStrategyAwardStock(strategyAward);
+    }
+
+    @Override
+    public Boolean subtractionAwardStock(String cacheKey) {
+        long surplus = redisService.decr(cacheKey);
+        if (surplus < 0){
+            // 库存小于0，恢复为0个
+            redisService.setValue(cacheKey, 0);
+            return false;
+        }
+        String lockKey = cacheKey + Constants.UNDERLINE + surplus;
+        Boolean lock = redisService.setNx(lockKey);
+        if (!lock) {
+            log.info("策略奖品库存加锁失败 {}", lockKey);
+        }
+        return lock;
     }
 }

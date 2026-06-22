@@ -4,6 +4,7 @@ import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.types.common.Constants;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
 import jakarta.annotation.Resource;
@@ -29,8 +30,14 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
     @Override
     public boolean assembleLotteryStrategy(Long strategyId) {
         List<StrategyAwardEntity> strategyAwardEntityList = repository.queryStrategyAwardList(strategyId);
+        //  缓存奖品库存【用于decr扣减库存使用】
+        for (StrategyAwardEntity strategyAward : strategyAwardEntityList) {
+            Integer awardId = strategyAward.getAwardId();
+            Integer awardCount = strategyAward.getAwardCount();
+            cacheStrategyAwardCount(strategyId, awardId, awardCount);
+        }
         assembleLotteryStrategy(String.valueOf(strategyId), strategyAwardEntityList);
-        StrategyEntity strategy =  repository.queryStrategy(strategyId);
+        StrategyEntity strategy = repository.queryStrategy(strategyId);
         if (null == strategy || StringUtils.isBlank(strategy.getRuleWeightRuleModel())) return true;
         StrategyRuleEntity strategyRuleEntity = repository.queryStrategyRule(strategyId, strategy.getRuleWeightRuleModel());
         if (null == strategyRuleEntity) {
@@ -46,6 +53,30 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
         }
         return true;
     }
+
+    @Override
+    public Integer getRandomAwardId(Long strategyId) {
+        // 分布式部署下，不一定为当前应用做的策略装配。也就是值不一定会保存到本应用，而是分布式应用，所以需要从 Redis 中获取。
+        int rateRange = repository.getRateRange(String.valueOf(strategyId));
+        // 通过生成的随机值，获取概率值奖品查找表的结果
+        return repository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
+    }
+
+    @Override
+    public Integer getRandomAwardId(Long strategyId, String ruleWeightValue) {
+        String key = String.valueOf(strategyId).concat("_").concat(ruleWeightValue);
+        // 分布式部署下，不一定为当前应用做的策略装配。也就是值不一定会保存到本应用，而是分布式应用，所以需要从 Redis 中获取。
+        int rateRange = repository.getRateRange(key);
+        // 通过生成的随机值，获取概率值奖品查找表的结果
+        return repository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
+    }
+
+    @Override
+    public Boolean subtractionAwardStock(Long strategyId, Integer awardId) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
+        return repository.subtractionAwardStock(cacheKey);
+    }
+
 
     private void assembleLotteryStrategy(String strategyId, List<StrategyAwardEntity> strategyAwardEntityList) {
         if (CollectionUtils.isEmpty(strategyAwardEntityList)) return;
@@ -80,20 +111,9 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
         repository.storeStrategyAwardSearchRateTable(strategyId, shuffleStrategyAwardSearchRateTable.size(), shuffleStrategyAwardSearchRateTable);
     }
 
-    @Override
-    public Integer getRandomAwardId(Long strategyId) {
-        // 分布式部署下，不一定为当前应用做的策略装配。也就是值不一定会保存到本应用，而是分布式应用，所以需要从 Redis 中获取。
-        int rateRange = repository.getRateRange(String.valueOf(strategyId));
-        // 通过生成的随机值，获取概率值奖品查找表的结果
-        return repository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
-    }
 
-    @Override
-    public Integer getRandomAwardId(Long strategyId, String ruleWeightValue) {
-        String key = String.valueOf(strategyId).concat("_").concat(ruleWeightValue);
-        // 分布式部署下，不一定为当前应用做的策略装配。也就是值不一定会保存到本应用，而是分布式应用，所以需要从 Redis 中获取。
-        int rateRange = repository.getRateRange(key);
-        // 通过生成的随机值，获取概率值奖品查找表的结果
-        return repository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
+    private void cacheStrategyAwardCount(Long strategyId, Integer awardId, Integer awardCount) {
+        String cacheKey = Constants.RedisKey.STRATEGY_AWARD_COUNT_KEY + strategyId + Constants.UNDERLINE + awardId;
+        repository.cacheStrategyAwardCount(cacheKey, awardCount);
     }
 }
