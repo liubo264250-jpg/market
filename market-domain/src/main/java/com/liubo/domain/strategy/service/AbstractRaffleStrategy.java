@@ -1,10 +1,9 @@
-package com.liubo.domain.strategy.service.raffle;
+package com.liubo.domain.strategy.service;
 
 import com.liubo.domain.strategy.model.entity.*;
 import com.liubo.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
-import com.liubo.domain.strategy.service.IRaffleStrategy;
 import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
 import com.liubo.domain.strategy.service.rule.chain.ILogicChain;
 import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;

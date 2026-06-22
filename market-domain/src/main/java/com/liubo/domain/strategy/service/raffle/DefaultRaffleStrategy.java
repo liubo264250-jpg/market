@@ -5,6 +5,7 @@ import com.liubo.domain.strategy.model.entity.RuleActionEntity;
 import com.liubo.domain.strategy.model.entity.RuleMatterEntity;
 import com.liubo.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.service.AbstractRaffleStrategy;
 import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
 import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
 import com.liubo.domain.strategy.service.rule.filter.ILogicFilter;
