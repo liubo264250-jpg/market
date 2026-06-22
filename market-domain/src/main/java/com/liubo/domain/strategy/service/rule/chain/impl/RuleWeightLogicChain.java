@@ -3,7 +3,7 @@ package com.liubo.domain.strategy.service.rule.chain.impl;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
 import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
 import com.liubo.domain.strategy.service.rule.chain.AbstractLogicChain;
-import com.liubo.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
+import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
 import com.liubo.types.common.Constants;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
     public Long userScore = 0L;
 
     @Override
-    public Integer logic(String userId, Long strategyId) {
+    public DefaultChainFactory.StrategyAwardVO logic(String userId, Long strategyId) {
         log.info("规则过滤-权重范围 userId:{} strategyId:{}", userId, strategyId);
         // 4000:102,103,104,105 5000:102,103,104,105,106,107 6000:102,103,104,105,106,107,108,109
         String strategyRuleValue = repository.queryStrategyRuleValue(strategyId, ruleModel());
@@ -46,7 +46,10 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
         if (null != nextValue) {
             Integer awardId = strategyDispatch.getRandomAwardId(strategyId, analyticalValueGroup.get(nextValue));
             log.info("抽奖责任链-权重接管 userId: {} strategyId: {} ruleModel: {} awardId: {}", userId, strategyId, ruleModel(), awardId);
-            return awardId;
+            return DefaultChainFactory.StrategyAwardVO.builder()
+                    .awardId(awardId)
+                    .logicModel(ruleModel())
+                    .build();
         }
         // 过滤其他责任链
         log.info("抽奖责任链-权重放行 userId: {} strategyId: {} ruleModel: {}", userId, strategyId, ruleModel());
@@ -55,10 +58,8 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
 
     @Override
     protected String ruleModel() {
-        return DefaultLogicFactory.LogicModel.RULE_WIGHT.getCode();
-
+        return DefaultChainFactory.LogicModel.RULE_WEIGHT.getCode();
     }
-
 
     private Map<Long, String> getAnalyticalValue(String strategyRuleValue) {
         String[] ruleValueGroups = strategyRuleValue.split(Constants.SPACE);

@@ -5,22 +5,17 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
-import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
+import com.liubo.domain.strategy.model.valobj.*;
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
-import com.liubo.infrastructure.persistent.dao.StrategyAwardMapper;
-import com.liubo.infrastructure.persistent.dao.StrategyMapper;
-import com.liubo.infrastructure.persistent.dao.StrategyRuleMapper;
-import com.liubo.infrastructure.persistent.po.Strategy;
-import com.liubo.infrastructure.persistent.po.StrategyAward;
-import com.liubo.infrastructure.persistent.po.StrategyRule;
+import com.liubo.infrastructure.persistent.dao.*;
+import com.liubo.infrastructure.persistent.po.*;
 import com.liubo.infrastructure.persistent.redis.IRedisService;
 import com.liubo.types.common.Constants;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +36,15 @@ public class StrategyRepository implements IStrategyRepository {
 
     @Resource
     private StrategyRuleMapper strategyRuleMapper;
+
+    @Resource
+    private RuleTreeMapper ruleTreeMapper;
+
+    @Resource
+    private RuleTreeNodeMapper ruleTreeNodeMapper;
+
+    @Resource
+    private RuleTreeNodeLineMapper ruleTreeNodeLineMapper;
 
     @Override
     public List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId) {
@@ -142,5 +146,51 @@ public class StrategyRepository implements IStrategyRepository {
                 .eq(StrategyAward::getAwardId, awardId));
         String ruleModels = Optional.ofNullable(strategyAward).map(StrategyAward::getRuleModels).orElse("");
         return StrategyAwardRuleModelVO.builder().ruleModels(ruleModels).build();
+    }
+
+    @Override
+    public RuleTreeVO queryRuleTreeVOByTreeId(String treeId) {
+        // 优先从缓存获取
+        String cacheKey = Constants.RedisKey.RULE_TREE_VO_KEY + treeId;
+        RuleTreeVO ruleTreeVOCache = redisService.getValue(cacheKey);
+        if (null != ruleTreeVOCache) return ruleTreeVOCache;
+
+        // 从数据库获取
+        RuleTree ruleTree = ruleTreeMapper.selectOne(Wrappers.<RuleTree>lambdaQuery().eq(RuleTree::getTreeId, treeId));
+        List<RuleTreeNode> ruleTreeNodes = ruleTreeNodeMapper.selectList(Wrappers.<RuleTreeNode>lambdaQuery().eq(RuleTreeNode::getTreeId, treeId));
+        List<RuleTreeNodeLine> ruleTreeNodeLines = ruleTreeNodeLineMapper.selectList(Wrappers.<RuleTreeNodeLine>lambdaQuery().eq(RuleTreeNodeLine::getTreeId, treeId));
+
+        // 1. tree node line 转换Map结构
+        Map<String, List<RuleTreeNodeLineVO>> ruleTreeNodeLineMap = ruleTreeNodeLines.stream()
+                .map(ruleTreeNodeLine -> RuleTreeNodeLineVO.builder()
+                        .treeId(ruleTreeNodeLine.getTreeId())
+                        .ruleNodeFrom(ruleTreeNodeLine.getRuleNodeFrom())
+                        .ruleNodeTo(ruleTreeNodeLine.getRuleNodeTo())
+                        .ruleLimitType(RuleLimitTypeVO.valueOf(ruleTreeNodeLine.getRuleLimitType()))
+                        .ruleLimitValue(RuleLogicCheckTypeVO.valueOf(ruleTreeNodeLine.getRuleLimitValue()))
+                        .build())
+                .collect(Collectors.groupingBy(RuleTreeNodeLineVO::getRuleNodeFrom));
+
+        // 2. tree node 转换为Map结构
+        Map<String, RuleTreeNodeVO> treeNodeMap = ruleTreeNodes.stream()
+                .map(ruleTreeNode -> RuleTreeNodeVO.builder()
+                        .treeId(ruleTreeNode.getTreeId())
+                        .ruleKey(ruleTreeNode.getRuleKey())
+                        .ruleDesc(ruleTreeNode.getRuleDesc())
+                        .ruleValue(ruleTreeNode.getRuleValue())
+                        .treeNodeLineVOList(ruleTreeNodeLineMap.get(ruleTreeNode.getRuleKey()))
+                        .build())
+                .collect(Collectors.toMap(RuleTreeNodeVO::getRuleKey, Function.identity(), (a, b) -> b));
+
+        // 3. 构建 Rule Tree
+        RuleTreeVO ruleTreeVODB = RuleTreeVO.builder()
+                .treeId(ruleTree.getTreeId())
+                .treeName(ruleTree.getTreeName())
+                .treeDesc(ruleTree.getTreeDesc())
+                .treeRootRuleNode(ruleTree.getTreeNodeRuleKey())
+                .treeNodeMap(treeNodeMap)
+                .build();
+        redisService.setValue(cacheKey, ruleTreeVODB);
+        return ruleTreeVODB;
     }
 }

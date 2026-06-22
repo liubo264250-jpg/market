@@ -36,14 +36,14 @@ public class DefaultTreeFactory {
     @Data
     public static class TreeActionEntity<T> {
         private RuleLogicCheckTypeVO ruleLogicCheckType;
-        private StrategyAwardData strategyAwardData;
+        private StrategyAwardVO strategyAwardVO;
     }
 
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     @Data
-    public static class StrategyAwardData {
+    public static class StrategyAwardVO {
         private Integer awardId;
         private String awardRuleValue;
     }

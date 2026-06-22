@@ -2,7 +2,7 @@ package com.liubo.domain.strategy.service.rule.chain.impl;
 
 import com.liubo.domain.strategy.repositroy.IStrategyRepository;
 import com.liubo.domain.strategy.service.rule.chain.AbstractLogicChain;
-import com.liubo.domain.strategy.service.rule.filter.factory.DefaultLogicFactory;
+import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
 import com.liubo.types.common.Constants;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class BackListLogicChain extends AbstractLogicChain {
     private IStrategyRepository repository;
 
     @Override
-    public Integer logic(String userId, Long strategyId) {
+    public DefaultChainFactory.StrategyAwardVO logic(String userId, Long strategyId) {
         log.info("规则过滤-黑名单 userId:{} strategyId:{}", userId, strategyId);
         // 100:user001,user002,user003
         String ruleValue = repository.queryStrategyRuleValue(strategyId, ruleModel());
@@ -29,7 +29,10 @@ public class BackListLogicChain extends AbstractLogicChain {
         String[] userBlackIds = splitRuleValue[1].split(Constants.SPLIT);
         for (String userBlackId : userBlackIds) {
             if (userBlackId.equals(userId)) {
-                return awardId;
+                return DefaultChainFactory.StrategyAwardVO.builder()
+                        .awardId(awardId)
+                        .logicModel(ruleModel())
+                        .build();
             }
         }
         // 过滤其他责任链
@@ -39,6 +42,6 @@ public class BackListLogicChain extends AbstractLogicChain {
 
     @Override
     protected String ruleModel() {
-        return DefaultLogicFactory.LogicModel.RULE_BLACKLIST.getCode();
+        return DefaultChainFactory.LogicModel.RULE_BLACKLIST.getCode();
     }
 }

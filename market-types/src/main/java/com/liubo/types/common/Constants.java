@@ -11,6 +11,7 @@ public class Constants {
         public static String STRATEGY_RATE_RANGE_KEY = "market_strategy_rate_range_key_";
         public static String STRATEGY_RATE_TABLE_KEY = "market_strategy_rate_table_key_";
         public static String STRATEGY_KEY = "market_strategy_key_";
+        public static String RULE_TREE_VO_KEY = "market_rule_tree_vo_key_";
     }
 
     public final static String STRATEGY_AWARD_KEY = "strategy_award_key_";
