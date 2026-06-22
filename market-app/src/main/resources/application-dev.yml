@@ -53,3 +53,7 @@ logging:
   level:
     root: info
   config: classpath:logback-spring.xml
+
+app:
+  config:
+    api-version: v1

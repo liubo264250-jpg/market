@@ -15,7 +15,7 @@ import java.util.Map;
  * 2026/5/29 07:55
  */
 public interface IStrategyRepository {
-    List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId);
+    List<StrategyAwardEntity> queryStrategyAwardEntityList(Long strategyId);
 
     void storeStrategyAwardSearchRateTable(String strategyId, int size, Map<Integer, Integer> shuffleStrategyAwardSearchRateTable);
 
@@ -23,11 +23,9 @@ public interface IStrategyRepository {
 
     int getRateRange(String strategyId);
 
-    StrategyEntity queryStrategy(Long strategyId);
+    StrategyEntity queryStrategyEntity(Long strategyId);
 
-    StrategyRuleEntity queryStrategyRule(Long strategyId, String ruleModel);
-
-    String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel);
+    StrategyRuleEntity queryStrategyRuleEntity(Long strategyId, String ruleModel);
 
     String queryStrategyRuleValue(Long strategyId, String ruleModel);
 
@@ -44,4 +42,6 @@ public interface IStrategyRepository {
     void updateStrategyAwardStock(Long strategyId, Integer awardId);
 
     Boolean subtractionAwardStock(String cacheKey);
+
+    StrategyAwardEntity queryStrategyAwardEntity(Long strategyId, Integer awardId);
 }

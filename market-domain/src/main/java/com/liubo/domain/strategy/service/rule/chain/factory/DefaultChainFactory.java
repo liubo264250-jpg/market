@@ -23,7 +23,7 @@ public class DefaultChainFactory {
     }
 
     public ILogicChain openLogicChain(Long strategyId) {
-        StrategyEntity strategy = repository.queryStrategy(strategyId);
+        StrategyEntity strategy = repository.queryStrategyEntity(strategyId);
         String[] ruleModels = strategy.ruleModels();
         if (null == ruleModels || 0 == ruleModels.length) return logicChainGroup.get(LogicModel.RULE_DEFAULT.code);
         ILogicChain logicChain = logicChainGroup.get(ruleModels[0]);

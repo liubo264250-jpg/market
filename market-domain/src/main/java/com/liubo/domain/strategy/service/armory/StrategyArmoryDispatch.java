@@ -29,7 +29,7 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
 
     @Override
     public boolean assembleLotteryStrategy(Long strategyId) {
-        List<StrategyAwardEntity> strategyAwardEntityList = repository.queryStrategyAwardList(strategyId);
+        List<StrategyAwardEntity> strategyAwardEntityList = repository.queryStrategyAwardEntityList(strategyId);
         //  缓存奖品库存【用于decr扣减库存使用】
         for (StrategyAwardEntity strategyAward : strategyAwardEntityList) {
             Integer awardId = strategyAward.getAwardId();
@@ -37,9 +37,9 @@ public class StrategyArmoryDispatch implements IStrategyArmory, IStrategyDispatc
             cacheStrategyAwardCount(strategyId, awardId, awardCount);
         }
         assembleLotteryStrategy(String.valueOf(strategyId), strategyAwardEntityList);
-        StrategyEntity strategy = repository.queryStrategy(strategyId);
+        StrategyEntity strategy = repository.queryStrategyEntity(strategyId);
         if (null == strategy || StringUtils.isBlank(strategy.getRuleWeightRuleModel())) return true;
-        StrategyRuleEntity strategyRuleEntity = repository.queryStrategyRule(strategyId, strategy.getRuleWeightRuleModel());
+        StrategyRuleEntity strategyRuleEntity = repository.queryStrategyRuleEntity(strategyId, strategy.getRuleWeightRuleModel());
         if (null == strategyRuleEntity) {
             throw new AppException(ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getCode(), ResponseCode.STRATEGY_RULE_WEIGHT_IS_NULL.getInfo());
         }

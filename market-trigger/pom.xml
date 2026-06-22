@@ -36,6 +36,10 @@
             <groupId>com.liubo</groupId>
             <artifactId>market-domain</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.liubo</groupId>
+            <artifactId>market-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

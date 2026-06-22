@@ -1,7 +1,5 @@
 package com.liubo.types.enums;
 
-import com.liubo.types.exception.AppException;
-
 /**
  * @author 68
  * 2026/6/2 09:45
@@ -32,18 +30,5 @@ public enum RuleModelEnum {
 
     public static boolean hitRuleWeight(String ruleModel) {
         return RULE_WEIGHT.getCode().equals(ruleModel);
-    }
-
-
-    public static RuleModelEnum getByCode(String code) {
-        if (null == code) {
-            return null;
-        }
-        for (RuleModelEnum anEnum : RuleModelEnum.values()) {
-            if (anEnum.getCode().equals(code)) {
-                return anEnum;
-            }
-        }
-        throw new AppException(ResponseCode.ENUM_NOT_FOUND.getCode(), ResponseCode.ENUM_NOT_FOUND.getInfo());
     }
 }
