@@ -10,9 +10,10 @@ import java.util.Date;
 
 /**
  * 抽奖活动单
+ *
  * @TableName raffle_activity_order
  */
-@TableName(value ="raffle_activity_order")
+@TableName(value = "raffle_activity_order")
 @Data
 public class RaffleActivityOrder {
     /**
@@ -86,6 +87,12 @@ public class RaffleActivityOrder {
      */
     @TableField(value = "state")
     private String state;
+
+    /**
+     * 外部业务防重单号
+     */
+    @TableField(value = "out_business_no")
+    private String outBusinessNo;
 
     /**
      * 创建时间

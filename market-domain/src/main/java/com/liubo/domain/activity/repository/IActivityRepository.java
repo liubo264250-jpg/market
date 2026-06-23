@@ -1,5 +1,6 @@
 package com.liubo.domain.activity.repository;
 
+import com.liubo.domain.activity.model.aggregate.CreateOrderAggregate;
 import com.liubo.domain.activity.model.entity.ActivityCountEntity;
 import com.liubo.domain.activity.model.entity.ActivityEntity;
 import com.liubo.domain.activity.model.entity.ActivitySkuEntity;
@@ -14,4 +15,6 @@ public interface IActivityRepository {
     ActivityEntity queryRaffleActivityByActivityId(Long activityId);
 
     ActivityCountEntity queryRaffleActivityCountByActivityCountId(Long activityCountId);
+
+    void doSaveOrder(CreateOrderAggregate createOrderAggregate);
 }

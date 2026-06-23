@@ -1,5 +1,6 @@
 package com.liubo.domain.activity.model.entity;
 
+import com.liubo.domain.activity.model.valobj.OrderStateVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -69,5 +70,10 @@ public class ActivityOrderEntity {
     /**
      * 订单状态（complete）
      */
-    private String state;
+    private OrderStateVO state;
+
+    /**
+     * 外部业务防重单号
+     */
+    private String outBusinessNo;
 }
