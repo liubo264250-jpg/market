@@ -1,0 +1,92 @@
+databaseName: market_db
+mode:
+  type: Standalone
+  repository:
+    type: JDBC
+dataSources:
+  market:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:13306/market
+    username: root
+    password: 123456
+  # 分片库1
+  market_01:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:13306/market_01
+    username: root
+    password: 123456
+  # 分片库2
+  market_02:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:13306/market_02
+    username: root
+    password: 123456
+rules:
+  # ========== 单表规则：market 库中不分片的表 ==========
+  - !SINGLE
+    tables:
+      - market.*
+    defaultDataSource: market  # 新建单表时默认落到 market 库
+
+  # ========== 分片规则：market_01、market_02 ==========
+  - !SHARDING
+    tables:
+      # raffle_activity_order 分库分表
+      raffle_activity_order:
+        actualDataNodes: market_0$->{1..2}.raffle_activity_order_00$->{0..3}
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+        tableStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: order-table-inline
+
+      # raffle_activity_account_flow 分库分表
+      raffle_activity_account_flow:
+        actualDataNodes: market_0$->{1..2}.raffle_activity_account_flow_00$->{0..3}
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+        tableStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: flow-table-inline
+
+      # raffle_activity_account 只分库不分表
+      raffle_activity_account:
+        actualDataNodes: market_0$->{1..2}.raffle_activity_account
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+
+    shardingAlgorithms:
+      db-inline:
+        type: CLASS_BASED
+        props:
+          pad-width: 2
+          start-index: 1
+          strategy: standard
+          algorithmClassName: com.liubo.sharding.algorithms.StringHashShardingAlgorithm
+      order-table-inline:
+        type: CLASS_BASED
+        props:
+          pad-width: 3
+          start-index: 0
+          strategy: standard
+          algorithmClassName: com.liubo.sharding.algorithms.StringHashShardingAlgorithm
+      flow-table-inline:
+        type: CLASS_BASED
+        props:
+          pad-width: 3
+          start-index: 0
+          strategy: standard
+          algorithmClassName: com.liubo.sharding.algorithms.StringHashShardingAlgorithm
+props:
+  sql-show: true
