@@ -3,7 +3,7 @@ package com.liubo.domain.strategy.service.armory;
 import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
-import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.repository.IStrategyRepository;
 import com.liubo.types.common.Constants;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;

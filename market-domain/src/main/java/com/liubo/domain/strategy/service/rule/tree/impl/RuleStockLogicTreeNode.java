@@ -2,7 +2,7 @@ package com.liubo.domain.strategy.service.rule.tree.impl;
 
 import com.liubo.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardStockKeyVO;
-import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.repository.IStrategyRepository;
 import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
 import com.liubo.domain.strategy.service.rule.tree.ILogicTreeNode;
 import com.liubo.domain.strategy.service.rule.tree.factory.DefaultTreeFactory;

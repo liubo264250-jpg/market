@@ -51,24 +51,6 @@ public class RaffleActivity {
     private Date endDateTime;
 
     /**
-     * 库存总量
-     */
-    @TableField(value = "stock_count")
-    private Integer stockCount;
-
-    /**
-     * 剩余库存
-     */
-    @TableField(value = "stock_count_surplus")
-    private Integer stockCountSurplus;
-
-    /**
-     * 活动参与次数配置
-     */
-    @TableField(value = "activity_count_id")
-    private Long activityCountId;
-
-    /**
      * 抽奖策略ID
      */
     @TableField(value = "strategy_id")

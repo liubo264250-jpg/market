@@ -1,6 +1,6 @@
 package com.liubo.domain.strategy.service.rule.chain.impl;
 
-import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.repository.IStrategyRepository;
 import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
 import com.liubo.domain.strategy.service.rule.chain.AbstractLogicChain;
 import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;

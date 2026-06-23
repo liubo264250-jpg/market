@@ -1,7 +1,7 @@
 package com.liubo.domain.strategy.service.rule.chain.factory;
 
 import com.liubo.domain.strategy.model.entity.StrategyEntity;
-import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.repository.IStrategyRepository;
 import com.liubo.domain.strategy.service.rule.chain.ILogicChain;
 import lombok.*;
 import org.springframework.stereotype.Service;

@@ -45,19 +45,6 @@ rules:
           standard:
             shardingColumn: user_id
             shardingAlgorithmName: order-table-inline
-
-      # raffle_activity_account_flow 分库分表
-      raffle_activity_account_flow:
-        actualDataNodes: market_0$->{1..2}.raffle_activity_account_flow_00$->{0..3}
-        databaseStrategy:
-          standard:
-            shardingColumn: user_id
-            shardingAlgorithmName: db-inline
-        tableStrategy:
-          standard:
-            shardingColumn: user_id
-            shardingAlgorithmName: flow-table-inline
-
       # raffle_activity_account 只分库不分表
       raffle_activity_account:
         actualDataNodes: market_0$->{1..2}.raffle_activity_account
@@ -75,13 +62,6 @@ rules:
           strategy: standard
           algorithmClassName: com.liubo.sharding.algorithms.StringHashShardingAlgorithm
       order-table-inline:
-        type: CLASS_BASED
-        props:
-          pad-width: 3
-          start-index: 0
-          strategy: standard
-          algorithmClassName: com.liubo.sharding.algorithms.StringHashShardingAlgorithm
-      flow-table-inline:
         type: CLASS_BASED
         props:
           pad-width: 3

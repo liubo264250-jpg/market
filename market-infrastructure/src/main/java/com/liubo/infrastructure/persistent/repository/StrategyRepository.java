@@ -6,7 +6,7 @@ import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
 import com.liubo.domain.strategy.model.valobj.*;
-import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.repository.IStrategyRepository;
 import com.liubo.infrastructure.persistent.dao.*;
 import com.liubo.infrastructure.persistent.po.*;
 import com.liubo.infrastructure.persistent.redis.IRedisService;

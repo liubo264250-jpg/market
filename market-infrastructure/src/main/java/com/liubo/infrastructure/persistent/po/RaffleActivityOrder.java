@@ -4,8 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 抽奖活动单
@@ -25,6 +26,12 @@ public class RaffleActivityOrder {
      */
     @TableField(value = "user_id")
     private String userId;
+
+    /**
+     * 商品sku
+     */
+    @TableField(value = "sku")
+    private Long sku;
 
     /**
      * 活动ID
@@ -57,7 +64,25 @@ public class RaffleActivityOrder {
     private Date orderTime;
 
     /**
-     * 订单状态（not_used、used、expire）
+     * 总次数
+     */
+    @TableField(value = "total_count")
+    private Integer totalCount;
+
+    /**
+     * 日次数
+     */
+    @TableField(value = "day_count")
+    private Integer dayCount;
+
+    /**
+     * 月次数
+     */
+    @TableField(value = "month_count")
+    private Integer monthCount;
+
+    /**
+     * 订单状态（complete）
      */
     @TableField(value = "state")
     private String state;

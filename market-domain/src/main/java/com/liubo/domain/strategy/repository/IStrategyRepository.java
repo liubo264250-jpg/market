@@ -1,4 +1,4 @@
-package com.liubo.domain.strategy.repositroy;
+package com.liubo.domain.strategy.repository;
 
 import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.entity.StrategyEntity;

@@ -4,7 +4,7 @@ import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.valobj.RuleTreeVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardStockKeyVO;
-import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.repository.IStrategyRepository;
 import com.liubo.domain.strategy.service.AbstractRaffleStrategy;
 import com.liubo.domain.strategy.service.IRaffleAward;
 import com.liubo.domain.strategy.service.IRaffleStock;

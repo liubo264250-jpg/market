@@ -3,7 +3,7 @@ package com.liubo.domain.strategy.service;
 import com.liubo.domain.strategy.model.entity.RaffleAwardEntity;
 import com.liubo.domain.strategy.model.entity.RaffleFactorEntity;
 import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
-import com.liubo.domain.strategy.repositroy.IStrategyRepository;
+import com.liubo.domain.strategy.repository.IStrategyRepository;
 import com.liubo.domain.strategy.service.armory.IStrategyDispatch;
 import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
 import com.liubo.domain.strategy.service.rule.tree.factory.DefaultTreeFactory;
