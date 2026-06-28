@@ -4,9 +4,9 @@ import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
 
 /**
  * @author 68
- * 2026/6/26 22:59
+ * 2026/6/28 15:57
  */
-public interface ISkuStock {
+public interface IRaffleActivitySkuStockService {
     ActivitySkuStockKeyVO takeQueueValue();
 
     void clearQueueValue();
@@ -14,5 +14,4 @@ public interface ISkuStock {
     void updateActivitySkuStock(Long sku);
 
     void clearActivitySkuStock(Long sku);
-
 }

@@ -1,11 +1,12 @@
-package com.liubo.domain.activity.service;
+package com.liubo.domain.activity.service.quota;
 
 import com.liubo.domain.activity.model.aggregate.CreateOrderAggregate;
 import com.liubo.domain.activity.model.entity.*;
 import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
 import com.liubo.domain.activity.model.valobj.OrderStateVO;
 import com.liubo.domain.activity.repository.IActivityRepository;
-import com.liubo.domain.activity.service.rule.factory.DefaultActivityChainFactory;
+import com.liubo.domain.activity.service.IRaffleActivitySkuStockService;
+import com.liubo.domain.activity.service.quota.rule.factory.DefaultActivityChainFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,13 @@ import java.util.Date;
 
 /**
  * @author 68
- * 2026/6/23 17:48
+ * 2026/6/28 15:51
  */
 @Service
-public class RaffleActivityService extends  AbstractRaffleActivity implements ISkuStock{
-    public RaffleActivityService(IActivityRepository activityRepository,
-                                 DefaultActivityChainFactory defaultActivityChainFactory) {
-        super(activityRepository,defaultActivityChainFactory);
+public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAccountQuota implements IRaffleActivitySkuStockService {
+    public RaffleActivityAccountQuotaService(IActivityRepository activityRepository,
+                                             DefaultActivityChainFactory defaultActivityChainFactory) {
+        super(activityRepository, defaultActivityChainFactory);
     }
 
     @Override

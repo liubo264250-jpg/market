@@ -1,4 +1,4 @@
-package com.liubo.domain.activity.service.rule;
+package com.liubo.domain.activity.service.quota.rule;
 
 /**
  * @author 68

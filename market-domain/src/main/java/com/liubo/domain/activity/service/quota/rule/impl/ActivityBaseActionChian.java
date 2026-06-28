@@ -1,10 +1,10 @@
-package com.liubo.domain.activity.service.rule.impl;
+package com.liubo.domain.activity.service.quota.rule.impl;
 
 import com.liubo.domain.activity.model.entity.ActivityCountEntity;
 import com.liubo.domain.activity.model.entity.ActivityEntity;
 import com.liubo.domain.activity.model.entity.ActivitySkuEntity;
 import com.liubo.domain.activity.model.valobj.ActivityStateVO;
-import com.liubo.domain.activity.service.rule.AbstractActionChian;
+import com.liubo.domain.activity.service.quota.rule.AbstractActionChian;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class ActivityBaseActionChian extends AbstractActionChian {
             throw new AppException(ResponseCode.ACTIVITY_DATE_ERROR.getCode(), ResponseCode.ACTIVITY_DATE_ERROR.getInfo());
         }
         // 校验；活动状态
-        if (!ActivityStateVO.open.getCode().equals(activityEntity.getState())) {
+        if (!ActivityStateVO.open.equals(activityEntity.getState())) {
             throw new AppException(ResponseCode.ACTIVITY_STATE_ERROR.getCode(), ResponseCode.ACTIVITY_STATE_ERROR.getInfo());
         }
         // 库存

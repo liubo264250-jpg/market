@@ -18,4 +18,12 @@ public enum ActivityStateVO {
     private final String code;
     private final String desc;
 
+    public static ActivityStateVO findByCode(String code) {
+        for (ActivityStateVO activityStateVO : values()) {
+            if (activityStateVO.getCode().equals(code)) {
+                return activityStateVO;
+            }
+        }
+        return null;
+    }
 }

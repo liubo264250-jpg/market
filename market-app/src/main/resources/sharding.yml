@@ -44,7 +44,7 @@ rules:
         tableStrategy:
           standard:
             shardingColumn: user_id
-            shardingAlgorithmName: order-table-inline
+            shardingAlgorithmName: table-inline
       # raffle_activity_account 只分库不分表
       raffle_activity_account:
         actualDataNodes: market_0$->{1..2}.raffle_activity_account
@@ -52,6 +52,42 @@ rules:
           standard:
             shardingColumn: user_id
             shardingAlgorithmName: db-inline
+      # raffle_activity_account_day 只分库不分表
+      raffle_activity_account_day:
+        actualDataNodes: market_0$->{1..2}.raffle_activity_account_day
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+      # raffle_activity_account_month 只分库不分表
+      raffle_activity_account_month:
+        actualDataNodes: market_0$->{1..2}.raffle_activity_account_month
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+      # user_award_record 分库分表
+      user_award_record:
+        actualDataNodes: market_0$->{1..2}.user_award_record_00$->{0..3}
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+        tableStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: table-inline
+      # user_raffle_order 分库分表
+      user_raffle_order:
+        actualDataNodes: market_0$->{1..2}.user_raffle_order_00$->{0..3}
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+        tableStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: table-inline
 
     shardingAlgorithms:
       db-inline:
@@ -61,7 +97,7 @@ rules:
           start-index: 1
           strategy: standard
           algorithmClassName: com.liubo.sharding.algorithms.StringHashShardingAlgorithm
-      order-table-inline:
+      table-inline:
         type: CLASS_BASED
         props:
           pad-width: 3

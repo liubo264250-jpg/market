@@ -2,7 +2,7 @@ package com.liubo.trigger.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.liubo.domain.activity.service.ISkuStock;
+import com.liubo.domain.activity.service.IRaffleActivitySkuStockService;
 import com.liubo.types.event.BaseEvent;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 )
 public class ActivitySkuStockZeroCustomer implements RocketMQListener<String> {
     @Resource
-    private ISkuStock skuStock;
+    private IRaffleActivitySkuStockService raffleActivitySkuStockService;
 
     @Override
     public void onMessage(String message) {
@@ -34,8 +34,8 @@ public class ActivitySkuStockZeroCustomer implements RocketMQListener<String> {
                     });
             // 处理业务逻辑
             Long sku = eventMessage.getData();
-            skuStock.clearActivitySkuStock(sku);
-            skuStock.clearQueueValue();
+            raffleActivitySkuStockService.clearActivitySkuStock(sku);
+            raffleActivitySkuStockService.clearQueueValue();
         } catch (Exception e) {
             log.error("消费MQ消息异常 message:{}", message, e);
             // 抛出异常会触发重试，确认是否需要重试再决定是否 throw

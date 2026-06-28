@@ -1,6 +1,6 @@
 package com.liubo.domain.activity.model.entity;
 
-import com.liubo.domain.activity.model.valobj.ActivityStateVO;
+import com.liubo.domain.activity.model.valobj.UserRaffleOrderStateVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,13 +10,18 @@ import java.util.Date;
 
 /**
  * @author 68
- * 2026/6/23 17:36
+ * 2026/6/28 17:44
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityEntity {
+public class UserRaffleOrderEntity {
+    /**
+     * 用户ID
+     */
+    private String userId;
+
     /**
      * 活动ID
      */
@@ -28,27 +33,22 @@ public class ActivityEntity {
     private String activityName;
 
     /**
-     * 活动描述
-     */
-    private String activityDesc;
-
-    /**
-     * 开始时间
-     */
-    private Date beginDateTime;
-
-    /**
-     * 结束时间
-     */
-    private Date endDateTime;
-
-    /**
      * 抽奖策略ID
      */
     private Long strategyId;
 
     /**
-     * 活动状态
+     * 订单ID
      */
-    private ActivityStateVO state;
+    private String orderId;
+
+    /**
+     * 下单时间
+     */
+    private Date orderTime;
+
+    /**
+     * 订单状态；create-创建、used-已使用、cancel-已作废
+     */
+    private UserRaffleOrderStateVO orderState;
 }

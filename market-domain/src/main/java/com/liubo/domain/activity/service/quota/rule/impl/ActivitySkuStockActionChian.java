@@ -1,4 +1,4 @@
-package com.liubo.domain.activity.service.rule.impl;
+package com.liubo.domain.activity.service.quota.rule.impl;
 
 import com.liubo.domain.activity.model.entity.ActivityCountEntity;
 import com.liubo.domain.activity.model.entity.ActivityEntity;
@@ -6,7 +6,7 @@ import com.liubo.domain.activity.model.entity.ActivitySkuEntity;
 import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
 import com.liubo.domain.activity.repository.IActivityRepository;
 import com.liubo.domain.activity.service.armory.IActivityDispatch;
-import com.liubo.domain.activity.service.rule.AbstractActionChian;
+import com.liubo.domain.activity.service.quota.rule.AbstractActionChian;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
 import jakarta.annotation.Resource;

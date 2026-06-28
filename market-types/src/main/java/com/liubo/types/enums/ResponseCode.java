@@ -17,6 +17,10 @@ public enum ResponseCode {
     ACTIVITY_STATE_ERROR("ERR_BIZ_003", "活动未开启（非open状态）"),
     ACTIVITY_DATE_ERROR("ERR_BIZ_004", "非活动日期范围"),
     ACTIVITY_SKU_STOCK_ERROR("ERR_BIZ_005", "活动库存不足"),
+    // todo
+    ACCOUNT_QUOTA_ERROR("ERR_BIZ_005", "活动库存不足"),
+    ACCOUNT_MONTH_QUOTA_ERROR("ACCOUNT_MONTH_QUOTA_ERROR", "活动库存不足"),
+    ACCOUNT_DAY_QUOTA_ERROR("ACCOUNT_MONTH_QUOTA_ERROR", "活动库存不足"),
     ;
 
     private String code;

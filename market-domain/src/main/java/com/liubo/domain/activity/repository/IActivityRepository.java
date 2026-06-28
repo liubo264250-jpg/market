@@ -1,9 +1,8 @@
 package com.liubo.domain.activity.repository;
 
 import com.liubo.domain.activity.model.aggregate.CreateOrderAggregate;
-import com.liubo.domain.activity.model.entity.ActivityCountEntity;
-import com.liubo.domain.activity.model.entity.ActivityEntity;
-import com.liubo.domain.activity.model.entity.ActivitySkuEntity;
+import com.liubo.domain.activity.model.aggregate.CreatePartakeOrderAggregate;
+import com.liubo.domain.activity.model.entity.*;
 import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
 
 import java.util.Date;
@@ -34,4 +33,14 @@ public interface IActivityRepository {
     void clearActivitySkuStock(Long sku);
 
     void clearQueueValue();
+
+    UserRaffleOrderEntity queryNoUsedRaffleOrder(PartakeRaffleActivityEntity partakeRaffleActivityEntity);
+
+    ActivityAccountEntity queryActivityAccountByUserId(String userId, Long activityId);
+
+    ActivityAccountMonthEntity queryActivityAccountMonthByUserId(String userId, Long activityId, String month);
+
+    ActivityAccountDayEntity queryActivityAccountDayByUserId(String userId, Long activityId, String day);
+
+    void saveCreatePartakeOrderAggregate(CreatePartakeOrderAggregate createPartakeOrderAggregate);
 }

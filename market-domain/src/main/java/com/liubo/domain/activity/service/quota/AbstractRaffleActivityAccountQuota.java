@@ -1,4 +1,4 @@
-package com.liubo.domain.activity.service;
+package com.liubo.domain.activity.service.quota;
 
 import com.liubo.domain.activity.model.aggregate.CreateOrderAggregate;
 import com.liubo.domain.activity.model.entity.ActivityCountEntity;
@@ -6,26 +6,24 @@ import com.liubo.domain.activity.model.entity.ActivityEntity;
 import com.liubo.domain.activity.model.entity.ActivitySkuEntity;
 import com.liubo.domain.activity.model.entity.SkuRechargeEntity;
 import com.liubo.domain.activity.repository.IActivityRepository;
-import com.liubo.domain.activity.service.rule.IActionChain;
-import com.liubo.domain.activity.service.rule.factory.DefaultActivityChainFactory;
+import com.liubo.domain.activity.service.IRaffleActivityAccountQuotaService;
+import com.liubo.domain.activity.service.quota.rule.IActionChain;
+import com.liubo.domain.activity.service.quota.rule.factory.DefaultActivityChainFactory;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author 68
- * 2026/6/23 17:32
+ * 2026/6/28 15:48
  */
-@Slf4j
-public abstract class AbstractRaffleActivity extends RaffleActivitySupport implements IRaffleOrder {
-
-    public AbstractRaffleActivity(IActivityRepository activityRepository, DefaultActivityChainFactory defaultActivityChainFactory) {
+public abstract class AbstractRaffleActivityAccountQuota extends RaffleActivityAccountQuotaSupport implements IRaffleActivityAccountQuotaService {
+    public AbstractRaffleActivityAccountQuota(IActivityRepository activityRepository, DefaultActivityChainFactory defaultActivityChainFactory) {
         super(activityRepository, defaultActivityChainFactory);
     }
 
     @Override
-    public String createSkuRechargeOrder(SkuRechargeEntity skuRechargeEntity) {
+    public String createOrder(SkuRechargeEntity skuRechargeEntity) {
         // 1. 参数校验
         String userId = skuRechargeEntity.getUserId();
         Long sku = skuRechargeEntity.getSku();

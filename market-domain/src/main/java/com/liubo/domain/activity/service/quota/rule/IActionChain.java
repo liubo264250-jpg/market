@@ -1,4 +1,4 @@
-package com.liubo.domain.activity.service.rule;
+package com.liubo.domain.activity.service.quota.rule;
 
 import com.liubo.domain.activity.model.entity.ActivityCountEntity;
 import com.liubo.domain.activity.model.entity.ActivityEntity;

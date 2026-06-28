@@ -1,7 +1,7 @@
 package com.liubo.infrastructure.persistent.dao;
 
-import com.liubo.infrastructure.persistent.po.RaffleActivityAccount;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.liubo.infrastructure.persistent.po.RaffleActivityAccount;
 
 /**
 * @author liubo
@@ -11,6 +11,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface RaffleActivityAccountMapper extends BaseMapper<RaffleActivityAccount> {
 
+    int updateActivityAccountSubtractionQuota(RaffleActivityAccount raffleActivityAccount);
+
+    void updateActivityAccountMonthSurplusImageQuota(RaffleActivityAccount updateActivityAccountDaySurplusImageQuota);
+
+    void updateActivityAccountDaySurplusImageQuota(RaffleActivityAccount updateActivityAccountMonthSurplusImageQuota);
 }
 
 

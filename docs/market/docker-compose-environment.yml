@@ -115,6 +115,8 @@ services:
       NAMESRV_ADDR: rocketmq-namesrv:9876
     command: sh mqbroker -c /home/rocketmq/conf/broker.conf
     volumes:
+#      - ./rocketmq/broker/logs:/home/rocketmq/logs
+      - ./rocketmq/broker/store:/home/rocketmq/store
       - ./rocketmq/broker/conf/broker.conf:/home/rocketmq/conf/broker.conf
     depends_on:
       - rocketmq-namesrv
