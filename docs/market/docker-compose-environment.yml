@@ -90,6 +90,50 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.3.1
+    container_name: rocketmq-namesrv
+    restart: always
+    ports:
+      - "9876:9876"
+    command: sh mqnamesrv
+    volumes:
+      - ./rocketmq/namesrv/logs:/home/rocketmq/logs
+    networks:
+      - my-network
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.3.1
+    container_name: rocketmq-broker
+    restart: always
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+      - "10912:10912"
+    environment:
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    command: sh mqbroker -c /home/rocketmq/conf/broker.conf
+    volumes:
+      - ./rocketmq/broker/conf/broker.conf:/home/rocketmq/conf/broker.conf
+    depends_on:
+      - rocketmq-namesrv
+    networks:
+      - my-network
+
+  rocketmq-dashboard:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: rocketmq-dashboard
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=rocketmq-namesrv:9876"
+    depends_on:
+      - rocketmq-namesrv
+    networks:
+      - my-network
+
 networks:
   my-network:
     driver: bridge

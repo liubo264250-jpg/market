@@ -36,6 +36,12 @@ redis:
       retry-interval: 1000
       ping-interval: 60000
       keep-alive: true
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: market_producer_group
+  topic:
+    activity_sku_stock_zero: "activity_sku_stock_zero"
 # 日志
 logging:
   level:

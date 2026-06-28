@@ -11,6 +11,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface RaffleActivitySkuMapper extends BaseMapper<RaffleActivitySku> {
 
+    void updateActivitySkuStock(RaffleActivitySku raffleActivitySku);
+
+    void clearActivitySkuStock(RaffleActivitySku raffleActivitySku);
 }
 
 
