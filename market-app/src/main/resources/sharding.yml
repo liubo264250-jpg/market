@@ -66,6 +66,13 @@ rules:
           standard:
             shardingColumn: user_id
             shardingAlgorithmName: db-inline
+      # task 只分库不分表
+      task:
+        actualDataNodes: market_0$->{1..2}.task
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
       # user_award_record 分库分表
       user_award_record:
         actualDataNodes: market_0$->{1..2}.user_award_record_00$->{0..3}

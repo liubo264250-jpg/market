@@ -16,4 +16,10 @@
     <sql id="Base_Column_List">
         id,topic,message,state,create_time,update_time
     </sql>
+    <select id="queryNoSendMessageTaskList" resultType="com.liubo.infrastructure.persistent.po.Task">
+        select user_id, topic, message_id, message
+        from task
+        where state = 'fail'
+           or (state = 'create' and TIMESTAMPDIFF(SECOND, update_time, NOW()) > 6) limit 10
+    </select>
 </mapper>

@@ -3,6 +3,8 @@ package com.liubo.infrastructure.persistent.dao;
 import com.liubo.infrastructure.persistent.po.Task;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
 * @author liubo
 * @description 针对表【task(任务表，发送MQ)】的数据库操作Mapper
@@ -11,6 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface TaskMapper extends BaseMapper<Task> {
 
+    List<Task> queryNoSendMessageTaskList();
 }
 
 

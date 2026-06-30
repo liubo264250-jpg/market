@@ -1,10 +1,10 @@
-package com.liubo.types.enums;
+package com.liubo.domain.strategy.model.valobj;
 
 /**
  * @author 68
  * 2026/6/2 09:45
  */
-public enum RuleModelEnum {
+public enum RuleModelVO {
     RULE_RANDOM("rule_random", "随机值计算"),
     RULE_LOCK("rule_lock", "抽奖几次后解锁"),
     RULE_LUCK_AWARD("rule_luck_award", "幸运奖(兜底奖品)"),
@@ -14,7 +14,7 @@ public enum RuleModelEnum {
     private final String code;
     private final String desc;
 
-    RuleModelEnum(String code, String desc) {
+    RuleModelVO(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }

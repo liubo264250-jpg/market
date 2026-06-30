@@ -42,6 +42,7 @@ rocketmq:
     group: market_producer_group
   topic:
     activity_sku_stock_zero: "activity_sku_stock_zero"
+    send_award: "send_award"
 # 日志
 logging:
   level:

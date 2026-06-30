@@ -1,7 +1,7 @@
 package com.liubo.domain.strategy.model.entity;
 
 import com.liubo.types.common.Constants;
-import com.liubo.types.enums.RuleModelEnum;
+import com.liubo.domain.strategy.model.valobj.RuleModelVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,7 +43,7 @@ public class StrategyEntity {
     public String getRuleWeightRuleModel() {
         return Arrays.stream(Optional.ofNullable(this.ruleModels())
                 .orElse(new String[0]))
-                .filter(RuleModelEnum::hitRuleWeight)
+                .filter(RuleModelVO::hitRuleWeight)
                 .findFirst()
                 .orElse(null);
     }
