@@ -23,9 +23,9 @@ import org.redisson.api.RDelayedQueue;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author 68
@@ -340,6 +340,22 @@ public class ActivityRepository implements IActivityRepository {
         saveUserRaffleOrder.setOrderTime(userRaffleOrderEntity.getOrderTime());
         saveUserRaffleOrder.setOrderState(userRaffleOrderEntity.getOrderState().getCode());
         userRaffleOrderMapper.insert(saveUserRaffleOrder);
+    }
+
+    @Override
+    public List<ActivitySkuEntity> queryActivitySkuListByActivityId(Long activityId) {
+        List<RaffleActivitySku> raffleActivitySkus = raffleActivitySkuMapper.selectList(Wrappers.<RaffleActivitySku>lambdaQuery().eq(RaffleActivitySku::getActivityId, activityId));
+        return Optional.ofNullable(raffleActivitySkus)
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(raffleActivitySku -> ActivitySkuEntity.builder()
+                        .sku(raffleActivitySku.getSku())
+                        .activityId(raffleActivitySku.getActivityId())
+                        .activityCountId(raffleActivitySku.getActivityCountId())
+                        .stockCount(raffleActivitySku.getStockCount())
+                        .stockCountSurplus(raffleActivitySku.getStockCountSurplus())
+                        .build()).collect(Collectors.toList());
+
     }
 
     @Override

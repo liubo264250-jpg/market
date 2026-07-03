@@ -44,4 +44,6 @@ public interface IStrategyRepository {
     Boolean subtractionAwardStock(String cacheKey);
 
     StrategyAwardEntity queryStrategyAwardEntity(Long strategyId, Integer awardId);
+
+    Long queryStrategyIdByActivityId(Long activityId);
 }

@@ -56,6 +56,9 @@ public class StrategyRepository implements IStrategyRepository {
     @Resource
     private RuleTreeNodeLineMapper ruleTreeNodeLineMapper;
 
+    @Resource
+    private RaffleActivityMapper raffleActivityMapper;
+
     @Override
     public List<StrategyAwardEntity> queryStrategyAwardEntityList(Long strategyId) {
         String strategyAwardRedisKey = Constants.RedisKey.STRATEGY_AWARD_KEY + strategyId;
@@ -109,11 +112,13 @@ public class StrategyRepository implements IStrategyRepository {
         StrategyEntity strategyEntity = redisService.getValue(cacheKey);
         if (null != strategyEntity) return strategyEntity;
         Strategy strategy = strategyMapper.selectOne(Wrappers.<Strategy>lambdaQuery().eq(Strategy::getStrategyId, strategyId));
-        strategyEntity = StrategyEntity.builder()
-                .strategyId(strategy.getStrategyId())
-                .strategyDesc(strategy.getStrategyDesc())
-                .ruleModels(strategy.getRuleModels())
-                .build();
+        strategyEntity = Optional.ofNullable(strategy)
+                .map(item -> StrategyEntity.builder()
+                        .strategyId(strategy.getStrategyId())
+                        .strategyDesc(strategy.getStrategyDesc())
+                        .ruleModels(strategy.getRuleModels())
+                        .build()).orElse(null);
+        if (null == strategyEntity) return strategyEntity;
         redisService.setValue(cacheKey, strategyEntity);
         return strategyEntity;
     }
@@ -258,5 +263,11 @@ public class StrategyRepository implements IStrategyRepository {
                 .ruleModels(strategyAward.getRuleModels())
                 .sort(strategyAward.getSort())
                 .build();
+    }
+
+    @Override
+    public Long queryStrategyIdByActivityId(Long activityId) {
+        RaffleActivity raffleActivity = raffleActivityMapper.selectOne(Wrappers.<RaffleActivity>lambdaQuery().eq(RaffleActivity::getActivityId, activityId));
+        return Optional.ofNullable(raffleActivity).map(RaffleActivity::getStrategyId).orElse(0L);
     }
 }

@@ -2,8 +2,8 @@ package com.liubo.api;
 
 import com.liubo.api.dto.RaffleAwardListRequestDTO;
 import com.liubo.api.dto.RaffleAwardListResponseDTO;
-import com.liubo.api.dto.RaffleRequestDTO;
-import com.liubo.api.dto.RaffleResponseDTO;
+import com.liubo.api.dto.RaffleStrategyRequestDTO;
+import com.liubo.api.dto.RaffleStrategyResponseDTO;
 import com.liubo.types.model.Response;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * @author 68
  * 2026/6/22 17:26
  */
-public interface IRaffleService {
+public interface IRaffleStrategyService {
     /**
      * 策略装配接口
      *
@@ -35,5 +35,5 @@ public interface IRaffleService {
      * @param requestDTO 请求参数
      * @return 抽奖结果
      */
-    Response<RaffleResponseDTO> randomRaffle(RaffleRequestDTO requestDTO);
+    Response<RaffleStrategyResponseDTO> randomRaffle(RaffleStrategyRequestDTO requestDTO);
 }

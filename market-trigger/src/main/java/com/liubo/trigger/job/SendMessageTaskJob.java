@@ -22,7 +22,7 @@ public class SendMessageTaskJob {
     @Resource
     private ThreadPoolExecutor executor;
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0 10 * * * ?")
     public void exec() {
         List<TaskEntity> taskEntities = taskService.queryNoSendMessageTaskList();
         if (taskEntities.isEmpty()) return;

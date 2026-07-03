@@ -7,15 +7,23 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author 68
- * 2026/6/22 17:29
+ * 2026/7/2 22:53
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RaffleResponseDTO {
-    // 奖品ID
+public class ActivityDrawResponseDTO {
+    /**
+     * 奖品ID
+     */
     private Integer awardId;
-    // 排序编号【策略奖品配置的奖品顺序编号】
+    /**
+     * 抽奖奖品标题
+     */
+    private String awardTitle;
+    /**
+     * 奖品顺序号
+     */
     private Integer awardIndex;
 }
