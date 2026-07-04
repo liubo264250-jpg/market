@@ -2,10 +2,12 @@ package com.liubo.domain.strategy.service.rule.tree;
 
 import com.liubo.domain.strategy.service.rule.tree.factory.DefaultTreeFactory;
 
+import java.util.Date;
+
 /**
  * @author 68
  * 2026/6/20 21:55
  */
 public interface ILogicTreeNode {
-    DefaultTreeFactory.TreeActionEntity logic(String userId, Long strategyId, Integer awardId,String ruleValue);
+    DefaultTreeFactory.TreeActionEntity logic(String userId, Long strategyId, Integer awardId, String ruleValue, Date endDateTime);
 }

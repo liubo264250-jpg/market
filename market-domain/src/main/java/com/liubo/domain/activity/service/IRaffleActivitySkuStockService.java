@@ -1,5 +1,6 @@
 package com.liubo.domain.activity.service;
 
+import com.liubo.domain.activity.model.entity.ActivitySkuEntity;
 import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
 
 /**
@@ -14,4 +15,6 @@ public interface IRaffleActivitySkuStockService {
     void updateActivitySkuStock(Long sku);
 
     void clearActivitySkuStock(Long sku);
+
+    ActivitySkuEntity queryActivitySku(Long sku);
 }

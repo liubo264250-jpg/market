@@ -16,6 +16,7 @@ import com.liubo.infrastructure.persistent.redis.IRedisService;
 import com.liubo.types.common.Constants;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
+import com.liubo.types.utils.DateUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
@@ -356,6 +357,17 @@ public class ActivityRepository implements IActivityRepository {
                         .stockCountSurplus(raffleActivitySku.getStockCountSurplus())
                         .build()).collect(Collectors.toList());
 
+    }
+
+    @Override
+    public Integer queryRaffleActivityAccountDayPartakeCount(Long activityId, String userId) {
+        RaffleActivityAccountDay raffleActivityAccountDay = raffleActivityAccountDayMapper.selectOne(Wrappers.<RaffleActivityAccountDay>lambdaQuery()
+                .eq(RaffleActivityAccountDay::getActivityId, activityId)
+                .eq(RaffleActivityAccountDay::getUserId, userId)
+                .eq(RaffleActivityAccountDay::getDay, DateUtils.formatDate(new Date())));
+        Integer dayCount = Optional.ofNullable(raffleActivityAccountDay).map(RaffleActivityAccountDay::getDayCount).orElse(0);
+        Integer dayCountSurplus = Optional.ofNullable(raffleActivityAccountDay).map(RaffleActivityAccountDay::getDayCountSurplus).orElse(0);
+        return dayCount -  dayCountSurplus;
     }
 
     @Override

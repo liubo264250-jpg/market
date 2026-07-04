@@ -31,6 +31,10 @@ public class UserRaffleOrderEntity {
      * 活动名称
      */
     private String activityName;
+    /**
+     * 结束时间
+     */
+    private Date endDateTime;
 
     /**
      * 抽奖策略ID

@@ -1,5 +1,6 @@
 package com.liubo.trigger.job;
 
+import com.liubo.domain.activity.model.entity.ActivitySkuEntity;
 import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
 import com.liubo.domain.activity.service.IRaffleActivitySkuStockService;
 import jakarta.annotation.Resource;
@@ -23,6 +24,8 @@ public class UpdateActivitySkuStockJob {
 //            log.info("定时任务，更新活动商品库存【延迟队列获取，降低对数据库的更新频次，不要产生竞争】");
             ActivitySkuStockKeyVO activitySkuStockKeyVO = raffleActivitySkuStockService.takeQueueValue();
             if (null == activitySkuStockKeyVO) return;
+            ActivitySkuEntity activitySkuEntity = raffleActivitySkuStockService.queryActivitySku(activitySkuStockKeyVO.getSku());
+            if (null == activitySkuEntity || activitySkuEntity.getStockCountSurplus() <= 0) return;
             log.info("定时任务，更新活动商品库存 sku:{} activityId:{}", activitySkuStockKeyVO.getSku(), activitySkuStockKeyVO.getActivityId());
             raffleActivitySkuStockService.updateActivitySkuStock(activitySkuStockKeyVO.getSku());
         } catch (Exception e) {

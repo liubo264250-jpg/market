@@ -18,9 +18,7 @@ import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RDelayedQueue;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -231,7 +229,7 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
-    public Boolean subtractionAwardStock(String cacheKey) {
+    public Boolean subtractionAwardStock(String cacheKey,Date endDateTime) {
         long surplus = redisService.decr(cacheKey);
         if (surplus < 0) {
             // 库存小于0，恢复为0个
@@ -239,7 +237,13 @@ public class StrategyRepository implements IStrategyRepository {
             return false;
         }
         String lockKey = cacheKey + Constants.UNDERLINE + surplus;
-        Boolean lock = redisService.setNx(lockKey);
+        Boolean lock = false;
+        if (null != endDateTime) {
+            long expireMillis = endDateTime.getTime() - System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1);
+            lock = redisService.setNx(lockKey, expireMillis, TimeUnit.MILLISECONDS);
+        } else {
+            lock = redisService.setNx(lockKey);
+        }
         if (!lock) {
             log.info("策略奖品库存加锁失败 {}", lockKey);
         }
@@ -269,5 +273,38 @@ public class StrategyRepository implements IStrategyRepository {
     public Long queryStrategyIdByActivityId(Long activityId) {
         RaffleActivity raffleActivity = raffleActivityMapper.selectOne(Wrappers.<RaffleActivity>lambdaQuery().eq(RaffleActivity::getActivityId, activityId));
         return Optional.ofNullable(raffleActivity).map(RaffleActivity::getStrategyId).orElse(0L);
+    }
+
+    @Override
+    public List<StrategyAwardEntity> queryRaffleStrategyAwardListByActivityId(Long activityId) {
+        Long strategyId = queryStrategyIdByActivityId(activityId);
+        List<StrategyAward> strategyAwardList = strategyAwardMapper.selectList(Wrappers.<StrategyAward>lambdaQuery().eq(StrategyAward::getStrategyId, strategyId));
+        return Optional.ofNullable(strategyAwardList).orElse(new ArrayList<>())
+                .stream()
+                .map(award -> StrategyAwardEntity.builder()
+                        .strategyId(award.getStrategyId())
+                        .awardId(award.getAwardId())
+                        .awardTitle(award.getAwardTitle())
+                        .awardSubtitle(award.getAwardSubtitle())
+                        .awardCount(award.getAwardCount())
+                        .awardCountSurplus(award.getAwardCountSurplus())
+                        .awardRate(award.getAwardRate())
+                        .ruleModels(award.getRuleModels())
+                        .sort(award.getSort())
+                        .build()).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Integer> queryAwardRuleLockCount(String[] treeIds) {
+        if (null == treeIds || treeIds.length == 0) return null;
+        List<String> treeIdList = Arrays.asList(treeIds);
+        List<RuleTreeNode> ruleTreeNodeList = ruleTreeNodeMapper.selectList(Wrappers.<RuleTreeNode>lambdaQuery()
+                .eq(RuleTreeNode::getRuleKey, RuleModelVO.RULE_LOCK.getCode())
+                .in(RuleTreeNode::getTreeId, treeIdList));
+        return ruleTreeNodeList.stream().collect(Collectors.toMap(
+                RuleTreeNode::getTreeId,
+                item -> Integer.valueOf(item.getRuleValue()),
+                (existing, replacement) -> existing // 重复key保留旧值
+        ));
     }
 }

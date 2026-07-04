@@ -1,5 +1,7 @@
 package com.liubo.domain.strategy.service.armory;
 
+import java.util.Date;
+
 /**
  * @author 68
  * 2026/6/3 09:26
@@ -15,5 +17,5 @@ public interface IStrategyDispatch {
 
     Integer getRandomAwardId(Long strategyId, String ruleWeightValue);
 
-    Boolean subtractionAwardStock(Long strategyId, Integer awardId);
+    Boolean subtractionAwardStock(Long strategyId, Integer awardId, Date endDateTime);
 }

@@ -2,6 +2,7 @@ package com.liubo.infrastructure.persistent.repository;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.liubo.domain.activity.model.valobj.UserRaffleOrderStateVO;
 import com.liubo.domain.award.model.aggregate.UserAwardRecordAggregate;
 import com.liubo.domain.award.model.entity.TaskEntity;
 import com.liubo.domain.award.model.entity.UserAwardRecordEntity;
@@ -10,8 +11,12 @@ import com.liubo.domain.award.repository.IAwardRepository;
 import com.liubo.infrastructure.event.EventPublisher;
 import com.liubo.infrastructure.persistent.dao.TaskMapper;
 import com.liubo.infrastructure.persistent.dao.UserAwardRecordMapper;
+import com.liubo.infrastructure.persistent.dao.UserRaffleOrderMapper;
 import com.liubo.infrastructure.persistent.po.Task;
 import com.liubo.infrastructure.persistent.po.UserAwardRecord;
+import com.liubo.infrastructure.persistent.po.UserRaffleOrder;
+import com.liubo.types.enums.ResponseCode;
+import com.liubo.types.exception.AppException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -31,6 +36,9 @@ public class AwardRepository implements IAwardRepository {
     private UserAwardRecordMapper userAwardRecordMapper;
 
     @Resource
+    private UserRaffleOrderMapper userRaffleOrderMapper;
+
+    @Resource
     private TaskMapper taskMapper;
 
     @Resource
@@ -42,11 +50,15 @@ public class AwardRepository implements IAwardRepository {
         UserAwardRecordEntity userAwardRecordEntity = userAwardRecordAggregate.getUserAwardRecordEntity();
         TaskEntity taskEntity = userAwardRecordAggregate.getTaskEntity();
         String userId = userAwardRecordEntity.getUserId();
+        Long activityId = userAwardRecordEntity.getActivityId();
+        Integer awardId = userAwardRecordEntity.getAwardId();
+        String orderId = userAwardRecordEntity.getOrderId();
+
         UserAwardRecord userAwardRecord = new UserAwardRecord();
         userAwardRecord.setUserId(userAwardRecordEntity.getUserId());
         userAwardRecord.setActivityId(userAwardRecordEntity.getActivityId());
         userAwardRecord.setStrategyId(userAwardRecordEntity.getStrategyId());
-        userAwardRecord.setOrderId(userAwardRecordEntity.getOrderId());
+        userAwardRecord.setOrderId(orderId);
         userAwardRecord.setAwardId(userAwardRecordEntity.getAwardId());
         userAwardRecord.setAwardTitle(userAwardRecordEntity.getAwardTitle());
         userAwardRecord.setAwardTime(userAwardRecordEntity.getAwardTime());
@@ -61,6 +73,16 @@ public class AwardRepository implements IAwardRepository {
 
         userAwardRecordMapper.insert(userAwardRecord);
         taskMapper.insert(task);
+        UserRaffleOrder userRaffleOrder = new UserRaffleOrder();
+        userRaffleOrder.setOrderState(UserRaffleOrderStateVO.used.getCode());
+        int count = userRaffleOrderMapper.update(userRaffleOrder, Wrappers.<UserRaffleOrder>lambdaUpdate()
+                .eq(UserRaffleOrder::getUserId, userId)
+                .eq(UserRaffleOrder::getOrderId, orderId)
+                .eq(UserRaffleOrder::getOrderState, UserRaffleOrderStateVO.create.getCode()));
+        if (1 != count) {
+            log.error("写入中奖记录，用户抽奖单已使用过，不可重复抽奖 userId: {} activityId: {} awardId: {}", userId, activityId, awardId);
+            throw new AppException(ResponseCode.ACTIVITY_ORDER_ERROR.getCode(), ResponseCode.ACTIVITY_ORDER_ERROR.getInfo());
+        }
 
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override

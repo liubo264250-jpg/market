@@ -7,6 +7,7 @@ import com.liubo.domain.strategy.model.valobj.RuleTreeVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardStockKeyVO;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,9 +42,13 @@ public interface IStrategyRepository {
 
     void updateStrategyAwardStock(Long strategyId, Integer awardId);
 
-    Boolean subtractionAwardStock(String cacheKey);
+    Boolean subtractionAwardStock(String cacheKey, Date endDateTime);
 
     StrategyAwardEntity queryStrategyAwardEntity(Long strategyId, Integer awardId);
 
     Long queryStrategyIdByActivityId(Long activityId);
+
+    List<StrategyAwardEntity> queryRaffleStrategyAwardListByActivityId(Long activityId);
+
+    Map<String, Integer> queryAwardRuleLockCount(String[] treeIds);
 }
