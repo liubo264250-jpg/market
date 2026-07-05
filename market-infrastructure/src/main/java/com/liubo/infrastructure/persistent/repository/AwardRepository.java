@@ -3,18 +3,17 @@ package com.liubo.infrastructure.persistent.repository;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.liubo.domain.activity.model.valobj.UserRaffleOrderStateVO;
+import com.liubo.domain.award.model.aggregate.GiveOutPrizesAggregate;
 import com.liubo.domain.award.model.aggregate.UserAwardRecordAggregate;
 import com.liubo.domain.award.model.entity.TaskEntity;
 import com.liubo.domain.award.model.entity.UserAwardRecordEntity;
+import com.liubo.domain.award.model.entity.UserCreditAwardEntity;
+import com.liubo.domain.award.model.valobj.AccountStatusVO;
 import com.liubo.domain.award.model.valobj.TaskStateVO;
 import com.liubo.domain.award.repository.IAwardRepository;
 import com.liubo.infrastructure.event.EventPublisher;
-import com.liubo.infrastructure.persistent.dao.TaskMapper;
-import com.liubo.infrastructure.persistent.dao.UserAwardRecordMapper;
-import com.liubo.infrastructure.persistent.dao.UserRaffleOrderMapper;
-import com.liubo.infrastructure.persistent.po.Task;
-import com.liubo.infrastructure.persistent.po.UserAwardRecord;
-import com.liubo.infrastructure.persistent.po.UserRaffleOrder;
+import com.liubo.infrastructure.persistent.dao.*;
+import com.liubo.infrastructure.persistent.po.*;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
 import jakarta.annotation.Resource;
@@ -23,6 +22,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.Optional;
 
 /**
  * @author 68
@@ -43,6 +44,12 @@ public class AwardRepository implements IAwardRepository {
 
     @Resource
     private EventPublisher eventPublisher;
+
+    @Resource
+    private AwardMapper awardMapper;
+
+    @Resource
+    private UserCreditAccountMapper userCreditAccountMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,5 +109,50 @@ public class AwardRepository implements IAwardRepository {
                 }
             }
         });
+    }
+
+    @Override
+    public String queryAwardConfig(Integer awardId) {
+        Award award = awardMapper.selectOne(Wrappers.<Award>lambdaQuery().eq(Award::getAwardId, awardId));
+        return Optional.ofNullable(award).map(Award::getAwardConfig).orElse("");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveGiveOutPrizesAggregate(GiveOutPrizesAggregate giveOutPrizesAggregate) {
+        String userId = giveOutPrizesAggregate.getUserId();
+        UserCreditAwardEntity userCreditAwardEntity = giveOutPrizesAggregate.getUserCreditAwardEntity();
+        UserAwardRecordEntity userAwardRecordEntity = giveOutPrizesAggregate.getUserAwardRecordEntity();
+
+        // 更新发奖记录
+        UserAwardRecord userAwardRecordReq = new UserAwardRecord();
+        userAwardRecordReq.setAwardState(userAwardRecordEntity.getAwardState().getCode());
+
+        // 更新用户积分 「首次则插入数据」
+        UserCreditAccount userCreditAccountReq = new UserCreditAccount();
+        userCreditAccountReq.setUserId(userCreditAwardEntity.getUserId());
+        userCreditAccountReq.setTotalAmount(userCreditAwardEntity.getCreditAmount());
+        userCreditAccountReq.setAvailableAmount(userCreditAwardEntity.getCreditAmount());
+        userCreditAccountReq.setAccountStatus(AccountStatusVO.open.getCode());
+
+        // 更新积分 || 创建积分账户
+        int updateAccountCount = userCreditAccountMapper.updateAddAmount(userCreditAccountReq);
+        if (0 == updateAccountCount) {
+            userCreditAccountMapper.insert(userCreditAccountReq);
+        }
+
+        // 更新奖品记录
+        int updateAwardCount = userAwardRecordMapper.update(userAwardRecordReq, Wrappers.<UserAwardRecord>lambdaUpdate()
+                .eq(UserAwardRecord::getUserId, userId)
+                .eq(UserAwardRecord::getOrderId, userAwardRecordEntity.getOrderId()));
+        if (0 == updateAwardCount) {
+            log.warn("更新中奖记录，重复更新拦截 userId:{} giveOutPrizesAggregate:{}", userId, JSON.toJSONString(giveOutPrizesAggregate));
+        }
+    }
+
+    @Override
+    public String queryAwardKey(Integer awardId) {
+        Award award = awardMapper.selectOne(Wrappers.<Award>lambdaQuery().eq(Award::getAwardId, awardId));
+        return Optional.ofNullable(award).map(Award::getAwardKey).orElse("");
     }
 }

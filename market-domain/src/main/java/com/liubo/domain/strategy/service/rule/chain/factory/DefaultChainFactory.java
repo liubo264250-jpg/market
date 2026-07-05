@@ -49,6 +49,8 @@ public class DefaultChainFactory {
          *
          */
         private String logicModel;
+
+        private String awardRuleValue;
     }
 
     @Getter

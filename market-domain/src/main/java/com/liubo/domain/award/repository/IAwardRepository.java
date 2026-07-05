@@ -1,5 +1,6 @@
 package com.liubo.domain.award.repository;
 
+import com.liubo.domain.award.model.aggregate.GiveOutPrizesAggregate;
 import com.liubo.domain.award.model.aggregate.UserAwardRecordAggregate;
 
 /**
@@ -8,4 +9,10 @@ import com.liubo.domain.award.model.aggregate.UserAwardRecordAggregate;
  */
 public interface IAwardRepository {
     void saveUserAwardRecord(UserAwardRecordAggregate userAwardRecordAggregate);
+
+    String queryAwardConfig(Integer awardId);
+
+    void saveGiveOutPrizesAggregate(GiveOutPrizesAggregate giveOutPrizesAggregate);
+
+    String queryAwardKey(Integer awardId);
 }
