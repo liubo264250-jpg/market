@@ -5,18 +5,19 @@
 <mapper namespace="com.liubo.infrastructure.persistent.dao.RaffleActivityAccountMonthMapper">
 
     <resultMap id="BaseResultMap" type="com.liubo.infrastructure.persistent.po.RaffleActivityAccountMonth">
-            <id property="id" column="id" />
-            <result property="userId" column="user_id" />
-            <result property="activityId" column="activity_id" />
-            <result property="month" column="month" />
-            <result property="monthCount" column="month_count" />
-            <result property="monthCountSurplus" column="month_count_surplus" />
-            <result property="createTime" column="create_time" />
-            <result property="updateTime" column="update_time" />
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="activityId" column="activity_id"/>
+        <result property="month" column="month"/>
+        <result property="monthCount" column="month_count"/>
+        <result property="monthCountSurplus" column="month_count_surplus"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,user_id,activity_id,month,month_count,month_count_surplus,
+        id
+        ,user_id,activity_id,month,month_count,month_count_surplus,
         create_time,update_time
     </sql>
     <update id="updateActivityAccountDaySubtractionQuota">
@@ -25,5 +26,12 @@
             update_time         = now()
         where user_id = #{userId} and activity_id = #{activityId} and month = #{month}
           and month_count_surplus > 0
+    </update>
+    <update id="addAccountQuota" parameterType="com.liubo.infrastructure.persistent.po.RaffleActivityAccountMonth">
+        update raffle_activity_account_month
+        set month_count_surplus = month_count_surplus + #{monthCountSurplus},
+            month_count         = month_count + #{monthCount},
+            update_time         = now()
+        where user_id = #{userId} and activity_id = #{activityId} and month = #{month}
     </update>
 </mapper>

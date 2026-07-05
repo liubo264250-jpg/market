@@ -12,4 +12,6 @@ public interface IRaffleActivityService {
     Response<Boolean> armory(Long activityId);
 
     Response<ActivityDrawResponseDTO> draw(ActivityDrawRequestDTO request);
+
+    Response<Boolean> calendarSignRebate(String userId);
 }

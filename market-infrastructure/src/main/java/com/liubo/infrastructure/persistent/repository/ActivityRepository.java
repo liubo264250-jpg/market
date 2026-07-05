@@ -402,12 +402,31 @@ public class ActivityRepository implements IActivityRepository {
         raffleActivityAccount.setDayCountSurplus(createOrderAggregate.getDayCount());
         raffleActivityAccount.setMonthCount(createOrderAggregate.getMonthCount());
         raffleActivityAccount.setMonthCountSurplus(createOrderAggregate.getMonthCount());
+
+        // 账户对象 - 月
+        RaffleActivityAccountMonth raffleActivityAccountMonth = new RaffleActivityAccountMonth();
+        raffleActivityAccountMonth.setUserId(createOrderAggregate.getUserId());
+        raffleActivityAccountMonth.setActivityId(createOrderAggregate.getActivityId());
+        raffleActivityAccountMonth.setMonth(DateUtils.formatMonth(new Date()));
+        raffleActivityAccountMonth.setMonthCount(createOrderAggregate.getMonthCount());
+        raffleActivityAccountMonth.setMonthCountSurplus(createOrderAggregate.getMonthCount());
+
+        // 账户对象 - 日
+        RaffleActivityAccountDay raffleActivityAccountDay = new RaffleActivityAccountDay();
+        raffleActivityAccountDay.setUserId(createOrderAggregate.getUserId());
+        raffleActivityAccountDay.setActivityId(createOrderAggregate.getActivityId());
+        raffleActivityAccountDay.setDay(DateUtils.formatDate(new Date()));
+        raffleActivityAccountDay.setDayCount(createOrderAggregate.getDayCount());
+        raffleActivityAccountDay.setDayCountSurplus(createOrderAggregate.getDayCount());
+
         raffleActivityOrderMapper.insert(raffleActivityOrder);
-        int update = raffleActivityAccountMapper.update(raffleActivityAccount, Wrappers.<RaffleActivityAccount>lambdaUpdate()
-                .eq(RaffleActivityAccount::getUserId, createOrderAggregate.getUserId())
-                .eq(RaffleActivityAccount::getActivityId, createOrderAggregate.getActivityId()));
+        int update = raffleActivityAccountMapper.updateAccountQuota(raffleActivityAccount);
         if (0 == update) {
             raffleActivityAccountMapper.insert(raffleActivityAccount);
         }
+        // 4. 更新账户 - 月
+        raffleActivityAccountMonthMapper.addAccountQuota(raffleActivityAccountMonth);
+        // 5. 更新账户 - 日
+        raffleActivityAccountDayMapper.addAccountQuota(raffleActivityAccountDay);
     }
 }

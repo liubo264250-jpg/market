@@ -1,5 +1,6 @@
 package com.liubo.trigger.http;
 
+import com.alibaba.fastjson.JSON;
 import com.liubo.api.IRaffleActivityService;
 import com.liubo.api.dto.ActivityDrawRequestDTO;
 import com.liubo.api.dto.ActivityDrawResponseDTO;
@@ -10,6 +11,9 @@ import com.liubo.domain.activity.service.armory.IActivityArmory;
 import com.liubo.domain.award.model.entity.UserAwardRecordEntity;
 import com.liubo.domain.award.model.valobj.AwardStateVO;
 import com.liubo.domain.award.service.IAwardService;
+import com.liubo.domain.rebate.model.entity.BehaviorEntity;
+import com.liubo.domain.rebate.model.valobj.BehaviorTypeVO;
+import com.liubo.domain.rebate.service.IBehaviorRebateService;
 import com.liubo.domain.strategy.model.entity.RaffleAwardEntity;
 import com.liubo.domain.strategy.model.entity.RaffleFactorEntity;
 import com.liubo.domain.strategy.service.IRaffleStrategy;
@@ -17,12 +21,14 @@ import com.liubo.domain.strategy.service.armory.IStrategyArmory;
 import com.liubo.types.enums.ResponseCode;
 import com.liubo.types.exception.AppException;
 import com.liubo.types.model.Response;
+import com.liubo.types.utils.DateUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 68
@@ -43,6 +49,8 @@ public class RaffleActivityController implements IRaffleActivityService {
     private IActivityArmory activityArmory;
     @Resource
     private IStrategyArmory strategyArmory;
+    @Resource
+    private IBehaviorRebateService behaviorRebateService;
 
     @Override
     @GetMapping(value = "armory")
@@ -124,6 +132,37 @@ public class RaffleActivityController implements IRaffleActivityService {
             return Response.<ActivityDrawResponseDTO>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
                     .info(ResponseCode.UN_ERROR.getInfo())
+                    .build();
+        }
+    }
+
+    @PostMapping(value = "calendar_sign_rebate")
+    public Response<Boolean> calendarSignRebate(@RequestParam String userId) {
+        try {
+            log.info("日历签到返利开始 userId:{}", userId);
+            BehaviorEntity behaviorEntity = new BehaviorEntity();
+            behaviorEntity.setUserId(userId);
+            behaviorEntity.setBehaviorTypeVO(BehaviorTypeVO.SIGN);
+            behaviorEntity.setOutBusinessNo(DateUtils.formatDate(new Date()));
+            List<String> orderIds = behaviorRebateService.createOrder(behaviorEntity);
+            log.info("日历签到返利完成 userId:{} orderIds: {}", userId, JSON.toJSONString(orderIds));
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
+                    .data(true)
+                    .build();
+        } catch (AppException e) {
+            log.error("日历签到返利异常 userId:{} ", userId, e);
+            return Response.<Boolean>builder()
+                    .code(e.getCode())
+                    .info(e.getInfo())
+                    .build();
+        } catch (Exception e) {
+            log.error("日历签到返利失败 userId:{}", userId,e);
+            return Response.<Boolean>builder()
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
+                    .data(false)
                     .build();
         }
     }

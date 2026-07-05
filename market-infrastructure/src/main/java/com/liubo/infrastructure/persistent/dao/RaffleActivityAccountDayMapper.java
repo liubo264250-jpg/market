@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface RaffleActivityAccountDayMapper extends BaseMapper<RaffleActivityAccountDay> {
 
     int updateActivityAccountMonthSubtractionQuota(RaffleActivityAccountDay updateRaffleActivityAccountDay);
+
+    void addAccountQuota(RaffleActivityAccountDay raffleActivityAccountDay);
 }
 
 
