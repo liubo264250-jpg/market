@@ -95,6 +95,17 @@ rules:
           standard:
             shardingColumn: user_id
             shardingAlgorithmName: table-inline
+      # user_behavior_rebate_order 分库分表
+      user_behavior_rebate_order:
+        actualDataNodes: market_0$->{1..2}.user_behavior_rebate_order_00$->{0..3}
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+        tableStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: table-inline
 
     shardingAlgorithms:
       db-inline:
