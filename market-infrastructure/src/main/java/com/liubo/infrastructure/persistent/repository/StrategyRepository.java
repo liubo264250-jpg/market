@@ -7,6 +7,7 @@ import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
 import com.liubo.domain.strategy.model.valobj.*;
 import com.liubo.domain.strategy.repository.IStrategyRepository;
+import com.liubo.domain.strategy.service.rule.chain.factory.DefaultChainFactory;
 import com.liubo.infrastructure.persistent.dao.*;
 import com.liubo.infrastructure.persistent.po.*;
 import com.liubo.infrastructure.persistent.redis.IRedisService;
@@ -16,6 +17,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RDelayedQueue;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -56,6 +58,8 @@ public class StrategyRepository implements IStrategyRepository {
 
     @Resource
     private RaffleActivityMapper raffleActivityMapper;
+    @Autowired
+    private RaffleActivityAccountMapper raffleActivityAccountMapper;
 
     @Override
     public List<StrategyAwardEntity> queryStrategyAwardEntityList(Long strategyId) {
@@ -229,7 +233,7 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
-    public Boolean subtractionAwardStock(String cacheKey,Date endDateTime) {
+    public Boolean subtractionAwardStock(String cacheKey, Date endDateTime) {
         long surplus = redisService.decr(cacheKey);
         if (surplus < 0) {
             // 库存小于0，恢复为0个
@@ -306,5 +310,70 @@ public class StrategyRepository implements IStrategyRepository {
                 item -> Integer.valueOf(item.getRuleValue()),
                 (existing, replacement) -> existing // 重复key保留旧值
         ));
+    }
+
+    @Override
+    public List<RuleWeightVO> queryAwardRuleWeight(Long strategyId) {
+        // 优先从缓存获取
+        String cacheKey = Constants.RedisKey.STRATEGY_RULE_WEIGHT_KEY + strategyId;
+        List<RuleWeightVO> ruleWeightVOS = redisService.getValue(cacheKey);
+        if (null != ruleWeightVOS) return ruleWeightVOS;
+
+        ruleWeightVOS = new ArrayList<>();
+        // 1. 查询权重规则配置
+        StrategyRule strategyRule = strategyRuleMapper.selectOne(Wrappers.<StrategyRule>lambdaQuery()
+                .eq(StrategyRule::getStrategyId, strategyId)
+                .eq(StrategyRule::getRuleModel, DefaultChainFactory.LogicModel.RULE_WEIGHT.getCode()));
+        String ruleValue = Optional.ofNullable(strategyRule).map(StrategyRule::getRuleValue).orElse("");
+        // 2. 借助实体对象转换规则
+        StrategyRuleEntity strategyRuleEntity = new StrategyRuleEntity();
+        strategyRuleEntity.setRuleModel(DefaultChainFactory.LogicModel.RULE_WEIGHT.getCode());
+        strategyRuleEntity.setRuleValue(ruleValue);
+        Map<String, List<Integer>> ruleWeightValues = strategyRuleEntity.getRuleWeightValues();
+        // 3. 遍历规则组装奖品配置
+        Set<String> ruleWeightKeys = ruleWeightValues.keySet();
+        for (String ruleWeightKey : ruleWeightKeys) {
+            List<Integer> awardIds = ruleWeightValues.get(ruleWeightKey);
+            List<RuleWeightVO.Award> awardList = new ArrayList<>();
+            // 也可以修改为一次从数据库查询
+            for (Integer awardId : awardIds) {
+                StrategyAward strategyAwardReq = new StrategyAward();
+                strategyAwardReq.setStrategyId(strategyId);
+                strategyAwardReq.setAwardId(awardId);
+                StrategyAward strategyAward = strategyAwardMapper.selectOne(Wrappers.<StrategyAward>lambdaQuery()
+                        .eq(StrategyAward::getStrategyId, strategyId)
+                        .eq(StrategyAward::getAwardId, awardId));
+                awardList.add(RuleWeightVO.Award.builder()
+                        .awardId(strategyAward.getAwardId())
+                        .awardTitle(strategyAward.getAwardTitle())
+                        .build());
+            }
+
+            ruleWeightVOS.add(RuleWeightVO.builder()
+                    .ruleValue(ruleValue)
+                    .weight(Integer.valueOf(ruleWeightKey.split(Constants.COLON)[0]))
+                    .awardIds(awardIds)
+                    .awardList(awardList)
+                    .build());
+        }
+
+        // 设置缓存 - 实际场景中，这类数据，可以在活动下架的时候统一清空缓存。
+        redisService.setValue(cacheKey, ruleWeightVOS);
+
+        return ruleWeightVOS;
+    }
+
+    @Override
+    public Integer queryActivityAccountTotalUseCount(String userId, Long strategyId) {
+        RaffleActivity raffleActivity = raffleActivityMapper.selectOne(Wrappers.<RaffleActivity>lambdaQuery().eq(RaffleActivity::getStrategyId, strategyId));
+        Long activityId = Optional.ofNullable(raffleActivity).map(RaffleActivity::getActivityId).orElse(0L);
+        RaffleActivityAccount raffleActivityAccount = raffleActivityAccountMapper.selectOne(Wrappers.<RaffleActivityAccount>lambdaQuery()
+                .eq(RaffleActivityAccount::getUserId, userId)
+                .eq(RaffleActivityAccount::getActivityId, activityId));
+        Integer totalCount = Optional.ofNullable(raffleActivityAccount).map(RaffleActivityAccount::getTotalCount).orElse(0);
+        Integer totalCountSurplus = Optional.ofNullable(raffleActivityAccount).map(RaffleActivityAccount::getTotalCountSurplus).orElse(0);
+
+        // 返回计算使用量
+        return totalCount - totalCountSurplus;
     }
 }

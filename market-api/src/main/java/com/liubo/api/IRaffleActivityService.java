@@ -2,6 +2,8 @@ package com.liubo.api;
 
 import com.liubo.api.dto.ActivityDrawRequestDTO;
 import com.liubo.api.dto.ActivityDrawResponseDTO;
+import com.liubo.api.dto.UserActivityAccountRequestDTO;
+import com.liubo.api.dto.UserActivityAccountResponseDTO;
 import com.liubo.types.model.Response;
 
 /**
@@ -14,4 +16,8 @@ public interface IRaffleActivityService {
     Response<ActivityDrawResponseDTO> draw(ActivityDrawRequestDTO request);
 
     Response<Boolean> calendarSignRebate(String userId);
+
+    Response<Boolean> isCalendarSignRebate(String userId);
+
+    Response<UserActivityAccountResponseDTO> queryUserActivityAccount(UserActivityAccountRequestDTO request);
 }

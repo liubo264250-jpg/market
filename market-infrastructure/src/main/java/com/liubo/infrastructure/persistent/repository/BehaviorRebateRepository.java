@@ -75,6 +75,7 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
             userBehaviorRebateOrder.setRebateType(behaviorRebateOrderEntity.getRebateType());
             userBehaviorRebateOrder.setRebateConfig(behaviorRebateOrderEntity.getRebateConfig());
             userBehaviorRebateOrder.setBizId(behaviorRebateOrderEntity.getBizId());
+            userBehaviorRebateOrder.setOutBusinessNo(behaviorRebateOrderEntity.getOutBusinessNo());
             userBehaviorRebateOrderMapper.insert(userBehaviorRebateOrder);
 
             // 任务对象
@@ -113,5 +114,24 @@ public class BehaviorRebateRepository implements IBehaviorRebateRepository {
                 }
             }
         });
+    }
+
+    @Override
+    public List<BehaviorRebateOrderEntity> queryOrderByOutBusinessNo(String userId, String outBusinessNo) {
+        List<UserBehaviorRebateOrder> userBehaviorRebateOrderList = userBehaviorRebateOrderMapper.selectList(Wrappers.<UserBehaviorRebateOrder>lambdaQuery()
+                .eq(UserBehaviorRebateOrder::getUserId, userId).eq(UserBehaviorRebateOrder::getOutBusinessNo, outBusinessNo));
+        return Optional.ofNullable(userBehaviorRebateOrderList)
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(userBehaviorRebateOrder -> BehaviorRebateOrderEntity.builder()
+                        .userId(userBehaviorRebateOrder.getUserId())
+                        .orderId(userBehaviorRebateOrder.getOrderId())
+                        .behaviorType(userBehaviorRebateOrder.getBehaviorType())
+                        .rebateDesc(userBehaviorRebateOrder.getRebateDesc())
+                        .rebateType(userBehaviorRebateOrder.getRebateType())
+                        .rebateConfig(userBehaviorRebateOrder.getRebateConfig())
+                        .bizId(userBehaviorRebateOrder.getBizId())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

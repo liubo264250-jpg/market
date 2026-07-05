@@ -63,6 +63,9 @@ public class UserBehaviorRebateOrder {
     @TableField(value = "biz_id")
     private String bizId;
 
+    @TableField(value = "out_business_no")
+    private String outBusinessNo;
+
     /**
      * 创建时间
      */

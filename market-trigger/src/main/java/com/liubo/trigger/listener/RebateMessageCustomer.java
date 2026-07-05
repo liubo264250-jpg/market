@@ -33,7 +33,6 @@ public class RebateMessageCustomer implements RocketMQListener<String> {
     @Override
     public void onMessage(String message) {
         try {
-            if (message.equals("abc")) return;
             BaseEvent.EventMessage<SendRebateMessageEvent.RebateMessage> eventMessage = JSON.parseObject(message, new TypeReference<BaseEvent.EventMessage<SendRebateMessageEvent.RebateMessage>>() {
             }.getType());
             SendRebateMessageEvent.RebateMessage rebateMessage = eventMessage.getData();

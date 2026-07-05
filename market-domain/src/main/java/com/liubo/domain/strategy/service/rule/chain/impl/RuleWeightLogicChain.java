@@ -25,9 +25,6 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
     @Resource
     private IStrategyDispatch strategyDispatch;
 
-    // 根据用户ID查询用户抽奖消耗的积分值，本章节我们先写死为固定的值。后续需要从数据库中查询。
-    public Long userScore = 0L;
-
     @Override
     public DefaultChainFactory.StrategyAwardVO logic(String userId, Long strategyId) {
         log.info("规则过滤-权重范围 userId:{} strategyId:{}", userId, strategyId);
@@ -37,6 +34,7 @@ public class RuleWeightLogicChain extends AbstractLogicChain {
         if (null == analyticalValueGroup || analyticalValueGroup.isEmpty()) {
             return null;
         }
+        Integer userScore = repository.queryActivityAccountTotalUseCount(userId, strategyId);
         List<Long> analyticalSortedKeys = new ArrayList<>(analyticalValueGroup.keySet());
         Long nextValue = analyticalSortedKeys.stream()
                 .sorted(Collections.reverseOrder())

@@ -19,5 +19,6 @@ public class Constants {
         public static String ACTIVITY_KEY = "market_activity_key_";
         public static String ACTIVITY_COUNT_KEY = "market_activity_count_key_";
         public static String ACTIVITY_SKU_COUNT_QUERY_KEY = "market_activity_sku_count_query_key_";
+        public static String STRATEGY_RULE_WEIGHT_KEY = "market_strategy_rule_weight_key_";
     }
 }

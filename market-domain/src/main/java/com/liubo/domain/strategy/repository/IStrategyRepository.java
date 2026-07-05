@@ -4,6 +4,7 @@ import com.liubo.domain.strategy.model.entity.StrategyAwardEntity;
 import com.liubo.domain.strategy.model.entity.StrategyEntity;
 import com.liubo.domain.strategy.model.entity.StrategyRuleEntity;
 import com.liubo.domain.strategy.model.valobj.RuleTreeVO;
+import com.liubo.domain.strategy.model.valobj.RuleWeightVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import com.liubo.domain.strategy.model.valobj.StrategyAwardStockKeyVO;
 
@@ -51,4 +52,8 @@ public interface IStrategyRepository {
     List<StrategyAwardEntity> queryRaffleStrategyAwardListByActivityId(Long activityId);
 
     Map<String, Integer> queryAwardRuleLockCount(String[] treeIds);
+
+    List<RuleWeightVO> queryAwardRuleWeight(Long strategyId);
+
+    Integer queryActivityAccountTotalUseCount(String userId, Long strategyId);
 }

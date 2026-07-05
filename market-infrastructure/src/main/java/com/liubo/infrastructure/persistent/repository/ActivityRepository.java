@@ -418,8 +418,10 @@ public class ActivityRepository implements IActivityRepository {
         raffleActivityAccountDay.setDay(DateUtils.formatDate(new Date()));
         raffleActivityAccountDay.setDayCount(createOrderAggregate.getDayCount());
         raffleActivityAccountDay.setDayCountSurplus(createOrderAggregate.getDayCount());
-
-        raffleActivityOrderMapper.insert(raffleActivityOrder);
+        boolean exists = raffleActivityOrderMapper.exists(Wrappers.<RaffleActivityOrder>lambdaQuery().eq(RaffleActivityOrder::getOutBusinessNo, activityOrderEntity.getOutBusinessNo()));
+        if (!exists) {
+            raffleActivityOrderMapper.insert(raffleActivityOrder);
+        }
         int update = raffleActivityAccountMapper.updateAccountQuota(raffleActivityAccount);
         if (0 == update) {
             raffleActivityAccountMapper.insert(raffleActivityAccount);

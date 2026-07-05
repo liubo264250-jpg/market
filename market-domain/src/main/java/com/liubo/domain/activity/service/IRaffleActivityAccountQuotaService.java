@@ -1,5 +1,6 @@
 package com.liubo.domain.activity.service;
 
+import com.liubo.domain.activity.model.entity.ActivityAccountEntity;
 import com.liubo.domain.activity.model.entity.SkuRechargeEntity;
 
 /**
@@ -11,4 +12,8 @@ public interface IRaffleActivityAccountQuotaService {
     String createOrder(SkuRechargeEntity skuRechargeEntity);
 
     Integer queryRaffleActivityAccountDayPartakeCount(Long activityId, String userId);
+
+    ActivityAccountEntity queryActivityAccountEntity(Long activityId, String userId);
+
+    Integer queryRaffleActivityAccountPartakeCount(Long activityId, String userId);
 }

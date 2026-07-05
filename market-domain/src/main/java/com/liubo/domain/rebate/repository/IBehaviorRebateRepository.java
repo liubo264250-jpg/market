@@ -1,6 +1,7 @@
 package com.liubo.domain.rebate.repository;
 
 import com.liubo.domain.rebate.model.aggregate.BehaviorRebateAggregate;
+import com.liubo.domain.rebate.model.entity.BehaviorRebateOrderEntity;
 import com.liubo.domain.rebate.model.valobj.BehaviorTypeVO;
 import com.liubo.domain.rebate.model.valobj.DailyBehaviorRebateVO;
 
@@ -14,4 +15,6 @@ public interface IBehaviorRebateRepository {
     List<DailyBehaviorRebateVO> queryDailyBehaviorRebateConfig(BehaviorTypeVO behaviorTypeVO);
 
     void saveUserRebateRecord(String userId, List<BehaviorRebateAggregate> behaviorRebateAggregates);
+
+    List<BehaviorRebateOrderEntity> queryOrderByOutBusinessNo(String userId, String outBusinessNo);
 }

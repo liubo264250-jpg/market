@@ -11,6 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * @author 68
@@ -84,5 +85,16 @@ public class RaffleActivityAccountQuotaService extends AbstractRaffleActivityAcc
     @Override
     public Integer queryRaffleActivityAccountDayPartakeCount(Long activityId, String userId) {
         return activityRepository.queryRaffleActivityAccountDayPartakeCount(activityId, userId);
+    }
+
+    @Override
+    public ActivityAccountEntity queryActivityAccountEntity(Long activityId, String userId) {
+        return activityRepository.queryActivityAccountByUserId(userId,activityId);
+    }
+
+    @Override
+    public Integer queryRaffleActivityAccountPartakeCount(Long activityId, String userId) {
+        ActivityAccountEntity activityAccountEntity = queryActivityAccountEntity(activityId, userId);
+        return Optional.ofNullable(activityAccountEntity).map(ActivityAccountEntity::getTotalCount).orElse(0);
     }
 }
