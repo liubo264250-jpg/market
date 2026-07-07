@@ -73,6 +73,13 @@ rules:
           standard:
             shardingColumn: user_id
             shardingAlgorithmName: db-inline
+      # user_credit_account 只分库不分表
+      user_credit_account:
+        actualDataNodes: market_0$->{1..2}.user_credit_account
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
       # user_award_record 分库分表
       user_award_record:
         actualDataNodes: market_0$->{1..2}.user_award_record_00$->{0..3}
@@ -106,7 +113,17 @@ rules:
           standard:
             shardingColumn: user_id
             shardingAlgorithmName: table-inline
-
+      # user_credit_order 分库分表
+      user_credit_order:
+        actualDataNodes: market_0$->{1..2}.user_credit_order_00$->{0..3}
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: db-inline
+        tableStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: table-inline
     shardingAlgorithms:
       db-inline:
         type: CLASS_BASED
@@ -123,4 +140,4 @@ rules:
           strategy: standard
           algorithmClassName: com.liubo.sharding.algorithms.StringHashShardingAlgorithm
 props:
-  sql-show: true
+  sql-show: false
