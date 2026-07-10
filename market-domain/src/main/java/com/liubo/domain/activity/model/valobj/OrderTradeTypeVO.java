@@ -5,13 +5,13 @@ import lombok.Getter;
 
 /**
  * @author 68
- * 2026/6/23 22:59
+ * 2026/7/8 09:44
  */
 @Getter
 @AllArgsConstructor
-public enum OrderStateVO {
-    completed("completed", "完成"),
-    wait_pay("wait_pay", "等待支付"),
+public enum OrderTradeTypeVO {
+    credit_pay_trade("credit_pay_trade", "创建"),
+    rebate_no_pay_trade("rebate_no_pay_trade", "创建"),
     ;
 
     private final String code;

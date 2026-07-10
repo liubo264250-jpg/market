@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * @author 68
  * 2026/6/23 17:38
@@ -38,4 +40,9 @@ public class ActivitySkuEntity {
      * 剩余库存
      */
     private Integer stockCountSurplus;
+
+    /**
+     * 商品金额
+     */
+    private BigDecimal productAmount;
 }

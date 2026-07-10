@@ -1,6 +1,9 @@
 package com.liubo.test;
 
 import com.alibaba.fastjson.JSON;
+import com.liubo.domain.activity.model.entity.SkuRechargeEntity;
+import com.liubo.domain.activity.model.valobj.OrderTradeTypeVO;
+import com.liubo.domain.activity.service.quota.RaffleActivityAccountQuotaService;
 import com.liubo.domain.credit.model.entity.TradeEntity;
 import com.liubo.domain.credit.model.valobj.TradeNameVO;
 import com.liubo.domain.credit.model.valobj.TradeTypeVO;
@@ -34,6 +37,8 @@ public class CreditAdjustServiceTest {
     @Resource
     private IBehaviorRebateService behaviorRebateService;
 
+    @Resource
+    private RaffleActivityAccountQuotaService raffleActivityAccountQuotaService;
     @Test
     public void test_createOrder_forward() {
         TradeEntity tradeEntity = new TradeEntity();
@@ -66,6 +71,30 @@ public class CreditAdjustServiceTest {
         List<String> orderIds = behaviorRebateService.createOrder(behaviorEntity);
         log.info("请求参数：{}", JSON.toJSONString(behaviorEntity));
         log.info("测试结果：{}", JSON.toJSONString(orderIds));
+        new CountDownLatch(1).await();
+    }
+
+    @Test
+    public void test_credit_pay_trade() {
+        SkuRechargeEntity skuRechargeEntity = new SkuRechargeEntity();
+        skuRechargeEntity.setUserId("xiaofuge");
+        skuRechargeEntity.setSku(9011L);
+        // outBusinessNo 作为幂等仿重使用，同一个业务单号2次使用会抛出索引冲突 Duplicate entry '700091009111' for key 'uq_out_business_no' 确保唯一性。
+        skuRechargeEntity.setOutBusinessNo("70009240608007");
+        skuRechargeEntity.setOrderTradeType(OrderTradeTypeVO.credit_pay_trade);
+        String orderId = raffleActivityAccountQuotaService.createOrder(skuRechargeEntity);
+        log.info("测试结果：{}", orderId);
+    }
+
+    @Test
+    public void test_createOrder_pay() throws InterruptedException {
+        TradeEntity tradeEntity = new TradeEntity();
+        tradeEntity.setUserId("xiaofuge");
+        tradeEntity.setTradeName(TradeNameVO.CONVERT_SKU);
+        tradeEntity.setTradeType(TradeTypeVO.REVERSE);
+        tradeEntity.setAmount(new BigDecimal("-1.68"));
+        tradeEntity.setOutBusinessNo("70009240609001");
+        creditAdjustService.createOrder(tradeEntity);
         new CountDownLatch(1).await();
     }
 }

@@ -1,6 +1,5 @@
 package com.liubo.domain.activity.model.entity;
 
-import com.liubo.domain.activity.model.valobj.OrderTradeTypeVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,24 +7,19 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author 68
- * 2026/6/23 22:23
+ * 2026/7/8 09:48
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkuRechargeEntity {
+public class DeliveryOrderEntity {
     /**
-     * 商品sku - 把每一个组合当做一个商品
-     */
-    private Long sku;
-    /**
-     * 用户id
+     * 用户ID
      */
     private String userId;
     /**
-     * 外部业务防重编号
+     * 业务仿重ID - 外部透传。返利、行为等唯一标识
      */
     private String outBusinessNo;
-    private OrderTradeTypeVO orderTradeType;
 }

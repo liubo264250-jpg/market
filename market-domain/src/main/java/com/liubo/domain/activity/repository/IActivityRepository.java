@@ -1,6 +1,6 @@
 package com.liubo.domain.activity.repository;
 
-import com.liubo.domain.activity.model.aggregate.CreateOrderAggregate;
+import com.liubo.domain.activity.model.aggregate.CreateQuotaOrderAggregate;
 import com.liubo.domain.activity.model.aggregate.CreatePartakeOrderAggregate;
 import com.liubo.domain.activity.model.entity.*;
 import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
@@ -18,8 +18,6 @@ public interface IActivityRepository {
     ActivityEntity queryRaffleActivityByActivityId(Long activityId);
 
     ActivityCountEntity queryRaffleActivityCountByActivityCountId(Long activityCountId);
-
-    void doSaveOrder(CreateOrderAggregate createOrderAggregate);
 
     void cacheActivitySkuStockCount(String cacheKey, Integer stockCount);
 
@@ -48,4 +46,10 @@ public interface IActivityRepository {
     List<ActivitySkuEntity> queryActivitySkuListByActivityId(Long activityId);
 
     Integer queryRaffleActivityAccountDayPartakeCount(Long activityId, String userId);
+
+    void doSaveCreditPayOrder(CreateQuotaOrderAggregate createQuotaOrderAggregate);
+
+    void doSaveNoPayOrder(CreateQuotaOrderAggregate createQuotaOrderAggregate);
+
+    void updateOrder(DeliveryOrderEntity deliveryOrderEntity);
 }

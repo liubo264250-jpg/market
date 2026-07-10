@@ -1,6 +1,7 @@
 package com.liubo.domain.activity.model.aggregate;
 
 import com.liubo.domain.activity.model.entity.ActivityOrderEntity;
+import com.liubo.domain.activity.model.valobj.OrderStateVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrderAggregate {
+public class CreateQuotaOrderAggregate {
     /**
      * 用户id
      */
@@ -38,4 +39,7 @@ public class CreateOrderAggregate {
 
     private ActivityOrderEntity activityOrderEntity;
 
+    public void setOrderState(OrderStateVO orderState) {
+        this.activityOrderEntity.setState(orderState);
+    }
 }

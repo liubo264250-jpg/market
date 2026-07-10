@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -93,6 +94,12 @@ public class RaffleActivityOrder {
      */
     @TableField(value = "out_business_no")
     private String outBusinessNo;
+
+    /**
+     * 支付金额【积分】
+     */
+    @TableField(value = "pay_amount")
+    private BigDecimal payAmount;
 
     /**
      * 创建时间

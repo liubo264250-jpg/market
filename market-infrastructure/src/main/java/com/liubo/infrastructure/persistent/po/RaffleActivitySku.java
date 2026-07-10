@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 
@@ -49,6 +51,12 @@ public class RaffleActivitySku {
      */
     @TableField(value = "stock_count_surplus")
     private Integer stockCountSurplus;
+
+    /**
+     * 商品金额
+     */
+    @TableField(value = "product_amount")
+    private BigDecimal productAmount;
 
     /**
      * 创建时间

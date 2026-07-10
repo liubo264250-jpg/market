@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -76,4 +77,8 @@ public class ActivityOrderEntity {
      * 外部业务防重单号
      */
     private String outBusinessNo;
+    /**
+     * 支付金额
+     */
+    private BigDecimal payAmount;
 }

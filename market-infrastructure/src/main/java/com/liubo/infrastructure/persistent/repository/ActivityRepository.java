@@ -2,11 +2,12 @@ package com.liubo.infrastructure.persistent.repository;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.liubo.domain.activity.event.ActivitySkuStockZeroMessageEvent;
-import com.liubo.domain.activity.model.aggregate.CreateOrderAggregate;
+import com.liubo.domain.activity.model.aggregate.CreateQuotaOrderAggregate;
 import com.liubo.domain.activity.model.aggregate.CreatePartakeOrderAggregate;
 import com.liubo.domain.activity.model.entity.*;
 import com.liubo.domain.activity.model.valobj.ActivitySkuStockKeyVO;
 import com.liubo.domain.activity.model.valobj.ActivityStateVO;
+import com.liubo.domain.activity.model.valobj.OrderStateVO;
 import com.liubo.domain.activity.model.valobj.UserRaffleOrderStateVO;
 import com.liubo.domain.activity.repository.IActivityRepository;
 import com.liubo.infrastructure.event.EventPublisher;
@@ -81,6 +82,7 @@ public class ActivityRepository implements IActivityRepository {
                 .activityCountId(raffleActivitySku.getActivityCountId())
                 .stockCount(raffleActivitySku.getStockCount())
                 .stockCountSurplus(cacheSkuStock.intValue())
+                .productAmount(raffleActivitySku.getProductAmount())
                 .build();
     }
 
@@ -367,12 +369,37 @@ public class ActivityRepository implements IActivityRepository {
                 .eq(RaffleActivityAccountDay::getDay, DateUtils.formatDate(new Date())));
         Integer dayCount = Optional.ofNullable(raffleActivityAccountDay).map(RaffleActivityAccountDay::getDayCount).orElse(0);
         Integer dayCountSurplus = Optional.ofNullable(raffleActivityAccountDay).map(RaffleActivityAccountDay::getDayCountSurplus).orElse(0);
-        return dayCount -  dayCountSurplus;
+        return dayCount - dayCountSurplus;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void doSaveOrder(CreateOrderAggregate createOrderAggregate) {
+    public void doSaveCreditPayOrder(CreateQuotaOrderAggregate createOrderAggregate) {
+// 创建交易订单
+        ActivityOrderEntity activityOrderEntity = createOrderAggregate.getActivityOrderEntity();
+        RaffleActivityOrder raffleActivityOrder = new RaffleActivityOrder();
+        raffleActivityOrder.setUserId(activityOrderEntity.getUserId());
+        raffleActivityOrder.setSku(activityOrderEntity.getSku());
+        raffleActivityOrder.setActivityId(activityOrderEntity.getActivityId());
+        raffleActivityOrder.setActivityName(activityOrderEntity.getActivityName());
+        raffleActivityOrder.setStrategyId(activityOrderEntity.getStrategyId());
+        raffleActivityOrder.setOrderId(activityOrderEntity.getOrderId());
+        raffleActivityOrder.setOrderTime(activityOrderEntity.getOrderTime());
+        raffleActivityOrder.setTotalCount(activityOrderEntity.getTotalCount());
+        raffleActivityOrder.setDayCount(activityOrderEntity.getDayCount());
+        raffleActivityOrder.setMonthCount(activityOrderEntity.getMonthCount());
+        raffleActivityOrder.setTotalCount(createOrderAggregate.getTotalCount());
+        raffleActivityOrder.setDayCount(createOrderAggregate.getDayCount());
+        raffleActivityOrder.setMonthCount(createOrderAggregate.getMonthCount());
+        raffleActivityOrder.setPayAmount(activityOrderEntity.getPayAmount());
+        raffleActivityOrder.setState(activityOrderEntity.getState().getCode());
+        raffleActivityOrder.setOutBusinessNo(activityOrderEntity.getOutBusinessNo());
+        raffleActivityOrderMapper.insert(raffleActivityOrder);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void doSaveNoPayOrder(CreateQuotaOrderAggregate createOrderAggregate) {
         // 订单对象
         ActivityOrderEntity activityOrderEntity = createOrderAggregate.getActivityOrderEntity();
         RaffleActivityOrder raffleActivityOrder = new RaffleActivityOrder();
@@ -425,6 +452,68 @@ public class ActivityRepository implements IActivityRepository {
         int update = raffleActivityAccountMapper.updateAccountQuota(raffleActivityAccount);
         if (0 == update) {
             raffleActivityAccountMapper.insert(raffleActivityAccount);
+        }
+        // 4. 更新账户 - 月
+        raffleActivityAccountMonthMapper.addAccountQuota(raffleActivityAccountMonth);
+        // 5. 更新账户 - 日
+        raffleActivityAccountDayMapper.addAccountQuota(raffleActivityAccountDay);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrder(DeliveryOrderEntity deliveryOrderEntity) {
+        // 查询订单
+        RaffleActivityOrder raffleActivityOrderReq = new RaffleActivityOrder();
+        raffleActivityOrderReq.setUserId(deliveryOrderEntity.getUserId());
+        raffleActivityOrderReq.setOutBusinessNo(deliveryOrderEntity.getOutBusinessNo());
+        RaffleActivityOrder raffleActivityOrder = raffleActivityOrderMapper.selectOne(Wrappers.<RaffleActivityOrder>lambdaQuery()
+                .eq(RaffleActivityOrder::getUserId, deliveryOrderEntity.getUserId())
+                .eq(RaffleActivityOrder::getOutBusinessNo, deliveryOrderEntity.getOutBusinessNo()));
+
+        // 账户对象 - 总
+        RaffleActivityAccount raffleActivityAccount = new RaffleActivityAccount();
+        raffleActivityAccount.setUserId(raffleActivityOrder.getUserId());
+        raffleActivityAccount.setActivityId(raffleActivityOrder.getActivityId());
+        raffleActivityAccount.setTotalCount(raffleActivityOrder.getTotalCount());
+        raffleActivityAccount.setTotalCountSurplus(raffleActivityOrder.getTotalCount());
+        raffleActivityAccount.setDayCount(raffleActivityOrder.getDayCount());
+        raffleActivityAccount.setDayCountSurplus(raffleActivityOrder.getDayCount());
+        raffleActivityAccount.setMonthCount(raffleActivityOrder.getMonthCount());
+        raffleActivityAccount.setMonthCountSurplus(raffleActivityOrder.getMonthCount());
+
+        // 账户对象 - 月
+        RaffleActivityAccountMonth raffleActivityAccountMonth = new RaffleActivityAccountMonth();
+        raffleActivityAccountMonth.setUserId(raffleActivityOrder.getUserId());
+        raffleActivityAccountMonth.setActivityId(raffleActivityOrder.getActivityId());
+        raffleActivityAccountMonth.setMonth(DateUtils.formatMonth(new Date()));
+        raffleActivityAccountMonth.setMonthCount(raffleActivityOrder.getMonthCount());
+        raffleActivityAccountMonth.setMonthCountSurplus(raffleActivityOrder.getMonthCount());
+
+        // 账户对象 - 日
+        RaffleActivityAccountDay raffleActivityAccountDay = new RaffleActivityAccountDay();
+        raffleActivityAccountDay.setUserId(raffleActivityOrder.getUserId());
+        raffleActivityAccountDay.setActivityId(raffleActivityOrder.getActivityId());
+        raffleActivityAccountDay.setDay(DateUtils.formatDate(new Date()));
+        raffleActivityAccountDay.setDayCount(raffleActivityOrder.getDayCount());
+        raffleActivityAccountDay.setDayCountSurplus(raffleActivityOrder.getDayCount());
+
+        RaffleActivityOrder updateOrderCompleted = new RaffleActivityOrder();
+        updateOrderCompleted.setState(OrderStateVO.completed.getCode());
+        int updateCount = raffleActivityOrderMapper.update(updateOrderCompleted, Wrappers.<RaffleActivityOrder>lambdaUpdate()
+                .eq(RaffleActivityOrder::getUserId, raffleActivityOrderReq.getUserId())
+                .eq(RaffleActivityOrder::getActivityId, raffleActivityOrderReq.getOutBusinessNo())
+                .eq(RaffleActivityOrder::getState,OrderStateVO.wait_pay.getCode()));
+        if (1 != updateCount) {
+            return;
+        }
+        // 2. 更新账户 - 总
+        RaffleActivityAccount raffleActivityAccountRes = raffleActivityAccountMapper.selectOne(Wrappers.<RaffleActivityAccount>lambdaQuery()
+                .eq(RaffleActivityAccount::getUserId, raffleActivityOrderReq.getUserId())
+                .eq(RaffleActivityAccount::getActivityId, raffleActivityOrder.getActivityId()));
+        if (null == raffleActivityAccountRes) {
+            raffleActivityAccountMapper.insert(raffleActivityAccount);
+        } else {
+            raffleActivityAccountMapper.updateAccountQuota(raffleActivityAccount);
         }
         // 4. 更新账户 - 月
         raffleActivityAccountMonthMapper.addAccountQuota(raffleActivityAccountMonth);
