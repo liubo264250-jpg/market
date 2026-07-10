@@ -1,5 +1,6 @@
 package com.liubo.domain.credit.service;
 
+import com.liubo.domain.credit.model.entity.CreditAccountEntity;
 import com.liubo.domain.credit.model.entity.TradeEntity;
 
 /**
@@ -8,4 +9,6 @@ import com.liubo.domain.credit.model.entity.TradeEntity;
  */
 public interface ICreditAdjustService {
     String createOrder(TradeEntity tradeEntity);
+
+    CreditAccountEntity queryUserCreditAccount(String userId);
 }

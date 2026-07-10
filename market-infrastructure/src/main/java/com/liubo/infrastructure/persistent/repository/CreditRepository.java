@@ -27,6 +27,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -133,5 +134,16 @@ public class CreditRepository implements ICreditRepository {
                 lock.unlock();
             }
         }
+    }
+
+    @Override
+    public CreditAccountEntity queryUserCreditAccount(String userId) {
+        UserCreditAccount userCreditAccount = userCreditAccountMapper.selectOne(Wrappers.<UserCreditAccount>lambdaQuery().eq(UserCreditAccount::getUserId, userId));
+        return Optional.ofNullable(userCreditAccount)
+                .map(item -> CreditAccountEntity.builder()
+                        .userId(userCreditAccount.getUserId())
+                        .adjustAmount(userCreditAccount.getAvailableAmount())
+                        .build()
+                ).orElse(null);
     }
 }

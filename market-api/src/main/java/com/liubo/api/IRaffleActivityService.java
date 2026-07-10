@@ -1,10 +1,10 @@
 package com.liubo.api;
 
-import com.liubo.api.dto.ActivityDrawRequestDTO;
-import com.liubo.api.dto.ActivityDrawResponseDTO;
-import com.liubo.api.dto.UserActivityAccountRequestDTO;
-import com.liubo.api.dto.UserActivityAccountResponseDTO;
+import com.liubo.api.dto.*;
 import com.liubo.types.model.Response;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author 68
@@ -20,4 +20,10 @@ public interface IRaffleActivityService {
     Response<Boolean> isCalendarSignRebate(String userId);
 
     Response<UserActivityAccountResponseDTO> queryUserActivityAccount(UserActivityAccountRequestDTO request);
+
+    Response<Boolean> creditPayExchangeSku(SkuProductShopCartRequestDTO request);
+
+    Response<List<SkuProductResponseDTO>> querySkuProductListByActivityId(Long activityId);
+
+    Response<BigDecimal> queryUserCreditAccount(String userId);
 }
