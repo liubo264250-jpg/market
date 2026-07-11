@@ -1,6 +1,5 @@
 server:
   port: 8091
-
 # 线程池配置
 thread:
   pool:
@@ -14,10 +13,18 @@ thread:
 
 ## 数据库配置；启动时配置数据库资源信息
 spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
     url: jdbc:shardingsphere:classpath:sharding.yml
-
+  config:
+    import:
+      - "nacos:market-app-dev.yml?group=DEFAULT_GROUP"
+  nacos:
+    config:
+      server-addr: 127.0.0.1:8848
 # MyBatis 配置【如需使用记得打开】
 #mybatis:
 #  mapper-locations: classpath:/mybatis/mapper/*.xml
@@ -50,6 +57,18 @@ logging:
   level:
     root: info
   config: classpath:logback-spring.xml
+dubbo:
+  application:
+    name: market
+    version: 1.0
+  registry:
+    id: nacos-registry
+    address: nacos://127.0.0.1:8848
+  protocol:
+    name: dubbo
+    port: -1
+  scan:
+    base-packages: com.liubo.api
 
 app:
   config:
